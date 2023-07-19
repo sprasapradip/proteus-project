@@ -9,3 +9,8 @@ In this project, we have developed a PCB (Printed Circuit Board) design that inc
 Project-2 involves the design and simulation of a PCB flasher and rectifier. The PCB flasher circuit is used to control the blinking of an LED or any other compatible component, while the rectifier circuit is used to convert AC (Alternating Current) to DC (Direct Current).
 
 ### Repository Link: [PCB Flasher & Rectifier](https://github.com/sprasapradip/proteus-project/tree/main/Project-2)
+# Getting Started
+To get started with these projects, follow the instructions below.
+
+## Prerequisites
+To simulate and visualize the projects, you will need to have Proteus installed on your system. Proteus is a powerful software tool used for electronic circuit design and simulation. You can download and install Proteus from the [Labcenter Electronics](https://www.labcenter.com/) website.
