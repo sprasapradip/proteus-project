@@ -17,9 +17,10 @@ To simulate and visualize the projects, you will need to have Proteus installed 
 ## Clone the Repository
 To clone this repository, open a terminal or command prompt and execute the following command:
 ```bash
-    git clone https://github.com/sprasapradip/proteus-project.git
+ git clone https://github.com/sprasapradip/proteus-project.git
 
 ## Running the Projects
+
 1 Project-1: PCB Design 3D Visualizer & Circuit Simulation
 - Open Proteus software.
 - Navigate to the Project-1 folder in the Proteus Projects repository.
