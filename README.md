@@ -14,3 +14,7 @@ To get started with these projects, follow the instructions below.
 
 ## Prerequisites
 To simulate and visualize the projects, you will need to have Proteus installed on your system. Proteus is a powerful software tool used for electronic circuit design and simulation. You can download and install Proteus from the [Labcenter Electronics](https://www.labcenter.com/) website.
+## Clone the Repository
+To clone this repository, open a terminal or command prompt and execute the following command:
+```bash
+git clone https://github.com/sprasapradip/proteus-project.git
