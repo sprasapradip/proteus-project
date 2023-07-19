@@ -34,4 +34,6 @@ To clone this repository, open a terminal or command prompt and execute the foll
 If you want to contribute to this repository or report any issues, feel free to create a pull request or raise an issue on the respective project's GitHub page.
 
 ## About the Author
-These projects were created and maintained by sprasapradip. Please reach out to the author for any questions or inquiries related to the projects.
+These projects were created and maintained by [sprasapradip](https://github.com/sprasapradip). Please reach out to the author for any questions or inquiries related to the projects.
+
+#### Thank you for using Proteus Projects! Happy tinkering and simulating!
