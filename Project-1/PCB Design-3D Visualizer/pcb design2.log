@@ -1,4 +1,4 @@
-# Writing all output to: E:\proteus-Project\Project\pcb design2.log
+# Writing all output to: E:\proteus-Project\Project\Project-1\PCB Design-3D Visualizer\pcb design2.log
 set pad_wire_necking on
 bus diagonal
 fanout 5
@@ -8,5 +8,3 @@ route 50 16
 clean 2
 filter 5
 recorner diagonal
-status_file
-
