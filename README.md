@@ -16,24 +16,22 @@ To get started with these projects, follow the instructions below.
 To simulate and visualize the projects, you will need to have Proteus installed on your system. Proteus is a powerful software tool used for electronic circuit design and simulation. You can download and install Proteus from the [Labcenter Electronics](https://www.labcenter.com/) website.
 ## Clone the Repository
 To clone this repository, open a terminal or command prompt and execute the following command:
-```bash
- git clone https://github.com/sprasapradip/proteus-project.git
-
+   ```bash
+   git clone https://github.com/sprasapradip/proteus-project.git
+```
 ## Running the Projects
-
-1 Project-1: PCB Design 3D Visualizer & Circuit Simulation
+###  Project-1: PCB Design 3D Visualizer & Circuit Simulation
 - Open Proteus software.
 - Navigate to the Project-1 folder in the Proteus Projects repository.
 - Open the Proteus project file (.prj) in Proteus.
 - You can now visualize the 3D PCB design and simulate the circuit.
-2 Project-2: PCB Flasher & Rectifier
-
-Open Proteus software.
-Navigate to the Project-2 folder in the Proteus Projects repository.
-Open the Proteus project file (.prj) in Proteus.
-You can now simulate the PCB flasher and rectifier circuits.
-Contributing
+### Project-2: PCB Flasher & Rectifier
+- Open Proteus software.
+- Navigate to the Project-2 folder in the Proteus Projects repository.
+- Open the Proteus project file (.prj) in Proteus.
+- You can now simulate the PCB flasher and rectifier circuits.
+## Contributing
 If you want to contribute to this repository or report any issues, feel free to create a pull request or raise an issue on the respective project's GitHub page.
 
-About the Author
+## About the Author
 These projects were created and maintained by sprasapradip. Please reach out to the author for any questions or inquiries related to the projects.
