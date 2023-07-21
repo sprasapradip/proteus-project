@@ -30,6 +30,11 @@ To clone this repository, open a terminal or command prompt and execute the foll
 - Navigate to the Project-2 folder in the Proteus Projects repository.
 - Open the Proteus project file (.prj) in Proteus.
 - You can now simulate the PCB flasher and rectifier circuits.
+
+- ## Project-4: traffic light controller
+In this project, we have developed a PCB (Printed Circuit Board) design that includes a 3D visualizer and circuit simulation. The purpose of this project is to provide a comprehensive view of the PCB layout along with the ability to simulate the circuit and observe its behavior.
+
+### Repository Link: [PCB Design ](https://github.com/sprasapradip/proteus-project/tree/main/traffic-light-controller)
 ## Contributing
 If you want to contribute to this repository or report any issues, feel free to create a pull request or raise an issue on the respective project's GitHub page.
 
