@@ -40,7 +40,7 @@ If you want to contribute to this repository or report any issues, feel free to 
 
 
 
-### Scoring Board using Arduino in Proteus
+### Project-4: Scoring Board using Arduino in Proteus
 Welcome to the Scoring Board using Arduino in Proteus repository! This project demonstrates a simple scoring board system implemented with an Arduino microcontroller and simulated using Proteus.
 
 ## Project Overview
