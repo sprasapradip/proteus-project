@@ -61,6 +61,12 @@ To simulate the project, you will need to have Proteus and Arduino IDE installed
 ## Project Overview
 The traffic light controller project aims to simulate the operation of a traffic signal system, including multiple traffic lights for different directions and pedestrian signals. The controller follows the standard traffic signal sequence to regulate the traffic and pedestrian movements effectively.
 
+### Clone the Repository
+To clone this repository, open a terminal or command prompt and execute the following command:
+
+```bash
+git clone https://github.com/sprasapradip/proteus-project.git
+
 ## Contributing
 If you want to contribute to this repository or report any issues, feel free to create a pull request or raise an issue on the respective project's GitHub page.
 
