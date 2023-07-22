@@ -40,10 +40,14 @@ If you want to contribute to this repository or report any issues, feel free to 
 
 
 
-# Project-3: Traffic Light Controller
-In Project-3, we have developed a traffic light controller using a printed circuit board (PCB) design. The purpose of this project is to create a functional traffic light system that can control the traffic flow at an intersection.
+### Scoring Board using Arduino in Proteus
+Welcome to the Scoring Board using Arduino in Proteus repository! This project demonstrates a simple scoring board system implemented with an Arduino microcontroller and simulated using Proteus.
 
-### Repository Link: [Traffic Light Controller](https://github.com/sprasapradip/proteus-project/tree/main/traffic-light-controller)
+## Project Overview
+The Scoring Board project aims to create a basic electronic scoring system that can be used for various games, sports, or events. The system utilizes an Arduino board to keep track of scores and displays the scores on a simulated display in Proteus.
+
+### Repository Link: [Scoring Board](https://github.com/sprasapradip/proteus-project/tree/main/scorring%20board)
+
 
 ## Project Overview
 The traffic light controller project aims to simulate the operation of a traffic signal system, including multiple traffic lights for different directions and pedestrian signals. The controller follows the standard traffic signal sequence to regulate the traffic and pedestrian movements effectively.
