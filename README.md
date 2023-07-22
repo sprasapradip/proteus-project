@@ -47,6 +47,13 @@ Welcome to the Scoring Board using Arduino in Proteus repository! This project d
 The Scoring Board project aims to create a basic electronic scoring system that can be used for various games, sports, or events. The system utilizes an Arduino board to keep track of scores and displays the scores on a simulated display in Proteus.
 
 ### Repository Link: [Scoring Board](https://github.com/sprasapradip/proteus-project/tree/main/scorring%20board)
+## Features
+- Keep track of two teams' scores in real-time.
+- Simulated display of scores using Proteus.
+- Simple and user-friendly interface.
+
+## Getting Started
+To get started with this project, follow the instructions below.
 
 
 ## Project Overview
