@@ -1,20 +1,25 @@
 <?xml version='1.0' encoding='UTF-8' standalone='yes'?>
 <WORKSPACE>
- <FRAME activewindow="0">
+ <FRAME activewindow="-1">
   <PLACEMENT>2c0000000200000003000000ffffffffffffffffffffffffffffffff8300000009000000d3040000cf020000</PLACEMENT>
-  <WINDOW type="default" module="ISIS"/>
-  <WINDOW type="default" module="ARES"/>
-  <WINDOW type="VIEW3D" module="VIEW3D">
-   <camera>
-    <position x="-15245184" y="-1379352" z="6812493"/>
-    <focus x="-2413431" y="-852387" z="-1601276"/>
-    <up x="12057" y="996657" z="80799"/>
-   </camera>
-  </WINDOW>
  </FRAME>
+ <MODULE name="ARES">
+  <editor metric="1" gridmajor="0" mode="00000000" zoom="10" scale="10" flipped="0" gridminor="0" gridmode="32" snapidx="3" snap="0" xcursor="0" orgmode="0" snaprange="0">
+   <world y1="-12700000" x1="-15240000" y2="12700000" x2="15240000"/>
+   <centre x="0" y="0"/>
+   <origin x="0" y="0"/>
+  </editor>
+ </MODULE>
+ <MODULE name="ISIS">
+  <editor metric="0" gridmajor="0" mode="00000000" zoom="10" scale="10" flipped="0" gridminor="0" gridmode="32" snapidx="2" snap="0" xcursor="0" orgmode="0" snaprange="0">
+   <world y1="1" x1="1" y2="-1" x2="-1"/>
+   <centre x="0" y="0"/>
+   <origin x="0" y="0"/>
+  </editor>
+ </MODULE>
  <MODULE name="VSMDEBUG">
   <PWI>
-   <POPUP w="800" x="207" flags="00000002" y="174" h="200" pid="0" iid="-1">
+   <POPUP w="800" x="68" flags="00000002" y="129" h="200" pid="0" iid="-1">
     <PROPERTIES>
      <ITEM name="Message Column Width">663</ITEM>
      <ITEM name="ShowGrid">No</ITEM>
@@ -22,7 +27,7 @@
      <ITEM name="Version">100</ITEM>
     </PROPERTIES>
    </POPUP>
-   <POPUP w="350" x="227" flags="00000032" y="194" h="200" pid="1" iid="-1">
+   <POPUP w="350" x="88" flags="00000032" y="149" h="200" pid="1" iid="-1">
     <PROPERTIES>
      <ITEM name="Address Column Width">83</ITEM>
      <ITEM name="AutoResize">No</ITEM>
@@ -38,6 +43,9 @@
      <ITEM name="Watch Expression Column Width">83</ITEM>
      <ITEM name="nItems">0</ITEM>
     </PROPERTIES>
+   </POPUP>
+   <POPUP w="695" x="447" flags="00000000" y="137" h="453" pid="0" iid="12">
+    <PROPERTIES/>
    </POPUP>
   </PWI>
  </MODULE>
