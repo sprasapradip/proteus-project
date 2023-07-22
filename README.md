@@ -54,6 +54,9 @@ The Scoring Board project aims to create a basic electronic scoring system that 
 ## Getting Started
 To get started with this project, follow the instructions below.
 
+### Prerequisites
+To simulate the project, you will need to have Proteus and Arduino IDE installed on your system. If you haven't installed them yet, you can download and install Proteus from the [Labcenter Electronics](https://www.labcenter.com/) website and Arduino IDE from the [Arduino website](https://www.arduino.cc/en/software).
+
 
 ## Project Overview
 The traffic light controller project aims to simulate the operation of a traffic signal system, including multiple traffic lights for different directions and pedestrian signals. The controller follows the standard traffic signal sequence to regulate the traffic and pedestrian movements effectively.
