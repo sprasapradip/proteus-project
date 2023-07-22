@@ -35,8 +35,7 @@ To clone this repository, open a terminal or command prompt and execute the foll
 In this project, we have developed a PCB (Printed Circuit Board) design that includes a 3D visualizer and circuit simulation. The purpose of this project is to provide a comprehensive view of the PCB layout along with the ability to simulate the circuit and observe its behavior.
 
 ### Repository Link: [traffic-light-controller](https://github.com/sprasapradip/proteus-project/tree/main/traffic-light-controller)
-## Contributing
-If you want to contribute to this repository or report any issues, feel free to create a pull request or raise an issue on the respective project's GitHub page.
+
 
 
 
@@ -59,6 +58,8 @@ To get started with this project, follow the instructions below.
 ## Project Overview
 The traffic light controller project aims to simulate the operation of a traffic signal system, including multiple traffic lights for different directions and pedestrian signals. The controller follows the standard traffic signal sequence to regulate the traffic and pedestrian movements effectively.
 
+## Contributing
+If you want to contribute to this repository or report any issues, feel free to create a pull request or raise an issue on the respective project's GitHub page.
 
 ## About the Author
 These projects were created and maintained by [sprasapradip](https://github.com/sprasapradip). Please reach out to the author for any questions or inquiries related to the projects.
