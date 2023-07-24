@@ -73,4 +73,7 @@ If you want to contribute to this repository or report any issues, feel free to 
 ## About the Author
 These projects were created and maintained by [sprasapradip](https://github.com/sprasapradip). Please reach out to the author for any questions or inquiries related to the projects.
 
+## Business inquiry
+If you have any of business quiry  feel free to share 
+
 #### Thank you for using Proteus Projects! Happy tinkering and simulating!
