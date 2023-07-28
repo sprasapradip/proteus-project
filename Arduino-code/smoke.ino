@@ -19,3 +19,14 @@ void loop() {
   Serial.print("Gas Value: ");
   Serial.println(gasValue);
 
+
+  // Check if the gas value exceeds the threshold
+  if (gasValue > gasThreshold) {
+    // Gas/smoke detected, trigger an alarm or take appropriate actions
+    // Replace the code below with your desired actions (e.g., sound a buzzer, send an alert, etc.)
+    Serial.println("Gas/Smoke detected!");
+  }
+
+  // Add a delay before taking the next gas reading
+  delay(1000); // Adjust this delay according to your application's needs
+}
