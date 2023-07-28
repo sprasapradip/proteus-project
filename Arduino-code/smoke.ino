@@ -1,32 +1,51 @@
-// Define the analog pin for the gas/smoke sensor
-const int gasSensorPin = A0;
+// Gas/Smoke Detector - Unique Style
 
-// Threshold value to trigger an alarm. Adjust this according to your sensor's sensitivity
-const int gasThreshold = 500; // Change this value based on your sensor's calibration
+const int GAS_SENSOR_PIN = A0;
+const int GAS_THRESHOLD = 500;
+
+const int BUZZER_PIN = 9;
+const int LED_PIN = 13;
+
+bool isGasDetected = false;
 
 void setup() {
-  // Initialize serial communication for debugging (optional)
+  pinMode(GAS_SENSOR_PIN, INPUT);
+  pinMode(BUZZER_PIN, OUTPUT);
+  pinMode(LED_PIN, OUTPUT);
+
   Serial.begin(9600);
-  // Set the gas sensor pin as an input
-  pinMode(gasSensorPin, INPUT);
+  Serial.println("Gas/Smoke Detector - Unique Style");
 }
 
 void loop() {
-  // Read the analog value from the gas sensor
-  int gasValue = analogRead(gasSensorPin);
+  int gasValue = analogRead(GAS_SENSOR_PIN);
 
-  // Print the raw analog value (optional, for debugging)
   Serial.print("Gas Value: ");
   Serial.println(gasValue);
 
-
-  // Check if the gas value exceeds the threshold
-  if (gasValue > gasThreshold) {
-    // Gas/smoke detected, trigger an alarm or take appropriate actions
-    // Replace the code below with your desired actions (e.g., sound a buzzer, send an alert, etc.)
-    Serial.println("Gas/Smoke detected!");
+  if (gasValue > GAS_THRESHOLD) {
+    if (!isGasDetected) {
+      isGasDetected = true;
+      activateAlarm();
+      Serial.println("Gas/Smoke detected!");
+    }
+  } else {
+    if (isGasDetected) {
+      isGasDetected = false;
+      deactivateAlarm();
+      Serial.println("Gas/Smoke cleared.");
+    }
   }
 
-  // Add a delay before taking the next gas reading
-  delay(1000); // Adjust this delay according to your application's needs
+  delay(1000);
+}
+
+void activateAlarm() {
+  tone(BUZZER_PIN, 2000, 1000);
+  digitalWrite(LED_PIN, HIGH);
+}
+
+void deactivateAlarm() {
+  noTone(BUZZER_PIN);
+  digitalWrite(LED_PIN, LOW);
 }
