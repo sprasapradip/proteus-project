@@ -4,6 +4,10 @@ Two infrared beams across the lane, a known distance apart. A vehicle breaks bea
 
 ![wiring](images/wiring.png)
 
+## Nepal demo
+
+[`demo/nepal-speed-watch.html`](demo/nepal-speed-watch.html) is a live browser demo with four simulated sites: Kathmandu, Pokhara, Chitwan and Hetauda. It has the LED speed display, the signs in English and Nepali, live statistics, and a side-by-side comparison of the four cities. Open it in any browser. The details and the site settings are in [demo/README.md](demo/README.md). The traffic is simulated.
+
 ## What it measures
 
 | Measurement | How |

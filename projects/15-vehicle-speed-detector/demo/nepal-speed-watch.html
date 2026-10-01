@@ -1,0 +1,772 @@
+<title>Nepal Speed Watch</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Mukta:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: site tabs on top, then the roadside unit (road + device) beside live numbers,
+   then charts and the log. Road-sign condensed type, Devanagari-ready body. */
+:root {
+  --bg: #eef1f3;          /* survey-sheet grey, slight blue bias */
+  --panel: #ffffff;
+  --ink: #15191d;
+  --ink-2: #4d565e;
+  --ink-3: #7d868e;
+  --line: #d5dbe0;
+  --accent: #b5122f;       /* Nepal flag crimson, used for limits and the brand mark */
+  --navy: #1b3a6b;         /* flag border blue, used for links and focus */
+  --asphalt: #3b4148;
+  --asphalt-edge: #2c3136;
+  --lane: #e9e6d6;
+  --beam: #ff4d4d;
+  --bike: #2a78d6;  --car: #1baf7a;  --heavy: #eb6834;   /* categorical slots 1, 3, 2 */
+  --bar: #2a78d6;
+  --ok: #2e8b3d;  --warn: #c98500;  --bad: #c7253e;
+  --device: #101316;  --device-edge: #2a2f35;
+  --led-on: #ffb02e;  --led-off: #2b2418;  --led-bad: #ff3b3b;
+  --font-display: "Barlow Condensed", "Arial Narrow", "Roboto Condensed", sans-serif;
+  --font-body: "Mukta", "Noto Sans Devanagari", "Segoe UI", system-ui, sans-serif;
+  --font-data: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #14181b; --panel: #1c2125; --ink: #eef1f3; --ink-2: #b3bcc4; --ink-3: #85909a;
+    --line: #2e353b; --accent: #ff4d64; --navy: #8fb2ea; --asphalt: #2b3035; --asphalt-edge: #1e2226;
+    --lane: #8f8b78; --bike: #3987e5; --car: #199e70; --heavy: #d95926; --bar: #3987e5;
+    --ok: #4fb35e; --warn: #e0a018; --bad: #ff5a6e; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #14181b; --panel: #1c2125; --ink: #eef1f3; --ink-2: #b3bcc4; --ink-3: #85909a;
+  --line: #2e353b; --accent: #ff4d64; --navy: #8fb2ea; --asphalt: #2b3035; --asphalt-edge: #1e2226;
+  --lane: #8f8b78; --bike: #3987e5; --car: #199e70; --heavy: #d95926; --bar: #3987e5;
+  --ok: #4fb35e; --warn: #e0a018; --bad: #ff5a6e; color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.5; }
+.wrap { max-width: 1180px; margin: 0 auto; padding-inline: 16px; padding-block: 20px 40px; display: grid; gap: 18px; }
+h1, h2, h3 { font-family: var(--font-display); font-weight: 700; line-height: 1.1; margin: 0; text-wrap: balance; }
+h1 { font-size: clamp(30px, 5vw, 44px); letter-spacing: .01em; }
+h2 { font-size: 22px; letter-spacing: .02em; }
+h3 { font-size: 17px; letter-spacing: .03em; text-transform: uppercase; color: var(--ink-2); font-weight: 600; }
+p { margin: 0; max-width: 68ch; }
+a { color: var(--navy); }
+:focus-visible { outline: 3px solid var(--navy); outline-offset: 2px; }
+.num { font-family: var(--font-data); font-variant-numeric: tabular-nums; }
+
+/* Header */
+header { display: grid; gap: 6px; }
+.eyebrow { font-family: var(--font-display); font-weight: 600; letter-spacing: .12em; text-transform: uppercase; font-size: 13px; color: var(--accent); }
+.lede { color: var(--ink-2); }
+.demo-note { display: inline-flex; gap: 8px; align-items: baseline; font-size: 13px; color: var(--ink-2); border-left: 3px solid var(--warn); padding: 2px 0 2px 10px; }
+
+/* City tabs */
+.tabs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.tab { all: unset; cursor: pointer; display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; align-items: center;
+  padding: 12px 14px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; min-width: 0; }
+.tab:hover { border-color: var(--ink-3); }
+.tab[aria-selected="true"] { border-color: var(--accent); box-shadow: inset 0 -3px 0 var(--accent); }
+.tab .sign { grid-row: span 2; }
+.tab .city { font-family: var(--font-display); font-weight: 700; font-size: 21px; line-height: 1; }
+.tab .city small { font-family: var(--font-body); font-weight: 500; font-size: 14px; color: var(--ink-2); margin-left: 4px; }
+.tab .road { font-size: 12.5px; color: var(--ink-2); line-height: 1.3; min-width: 0; }
+.tab .live { grid-column: 1 / -1; display: flex; gap: 12px; font-size: 12.5px; color: var(--ink-3); }
+
+/* Round speed-limit sign (Nepal uses the red-ring circle) */
+.sign { width: 44px; height: 44px; border-radius: 50%; background: #fff; border: 5px solid #c8102e;
+  display: grid; place-items: center; font-family: var(--font-display); font-weight: 700; font-size: 19px; color: #111; flex: none; }
+.sign.big { width: 64px; height: 64px; border-width: 7px; font-size: 27px; }
+
+/* Main row */
+.main { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px; display: grid; gap: 12px; min-width: 0; }
+.site-head { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+.site-head .txt { display: grid; gap: 2px; min-width: 0; flex: 1 1 220px; }
+.site-head .txt p { color: var(--ink-2); font-size: 14px; }
+.clock { font-family: var(--font-data); font-size: 15px; color: var(--ink-2); }
+
+canvas#road { width: 100%; height: 190px; display: block; border-radius: 8px; }
+
+/* Roadside device: LED speed display + three signs */
+.device { background: var(--device); border: 2px solid var(--device-edge); border-radius: 12px; padding: 14px;
+  display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: center; color: #e9ecef; }
+.led-wrap { display: grid; gap: 4px; justify-items: center; }
+.led-wrap .cap { font-family: var(--font-display); letter-spacing: .14em; font-size: 12px; color: #9aa3ab; text-transform: uppercase; }
+svg.led { width: 168px; height: 92px; }
+.led-unit { font-family: var(--font-display); font-size: 13px; color: #9aa3ab; letter-spacing: .1em; }
+.signs { display: grid; gap: 8px; min-width: 0; }
+.lamp { display: grid; grid-template-columns: 14px 1fr; gap: 2px 10px; align-items: center; padding: 8px 10px; border-radius: 8px;
+  border: 1px solid #2c3238; background: #171b1f; opacity: .38; transition: opacity .15s; }
+.lamp .dot { width: 14px; height: 14px; border-radius: 50%; grid-row: span 2; }
+.lamp b { font-family: var(--font-display); font-size: 18px; letter-spacing: .06em; line-height: 1.05; }
+.lamp span { font-size: 13px; color: #b9c1c8; line-height: 1.2; }
+.lamp.on { opacity: 1; }
+.lamp.slow .dot { background: var(--led-bad); box-shadow: 0 0 10px var(--led-bad); }
+.lamp.slow b { color: #ff6b6b; }
+.lamp.thanks .dot { background: #3ddc6a; box-shadow: 0 0 10px #3ddc6a; }
+.lamp.thanks b { color: #6fe895; }
+.lamp.dist .dot { background: var(--led-on); box-shadow: 0 0 10px var(--led-on); }
+.lamp.dist b { color: #ffc35a; }
+.lamp.blink { animation: blink .8s steps(2, jump-none) infinite; }
+@keyframes blink { 50% { opacity: .35; } }
+
+/* Controls */
+.controls { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; }
+.btn { font: 600 15px var(--font-display); letter-spacing: .05em; text-transform: uppercase; padding: 7px 14px; border-radius: 8px;
+  border: 1px solid var(--line); background: var(--bg); color: var(--ink); cursor: pointer; }
+.btn:hover { border-color: var(--ink-3); }
+.btn.primary { background: var(--ink); color: var(--panel); border-color: var(--ink); }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.seg button { all: unset; cursor: pointer; padding: 6px 11px; font: 600 14px var(--font-data); color: var(--ink-2); }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--panel); }
+.stepper { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; color: var(--ink-2); }
+.stepper button { all: unset; cursor: pointer; width: 28px; height: 28px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 6px; font: 700 16px var(--font-data); color: var(--ink); }
+.stepper .val { font: 600 16px var(--font-data); color: var(--ink); min-width: 2.5ch; text-align: center; }
+
+/* Stats */
+.tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.tile { padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; display: grid; gap: 2px; min-width: 0; }
+.tile .k { font-size: 12.5px; color: var(--ink-2); letter-spacing: .02em; }
+.tile .v { font: 600 26px var(--font-data); font-variant-numeric: tabular-nums; line-height: 1.1; }
+.tile .v small { font-size: 13px; font-weight: 400; color: var(--ink-3); margin-left: 3px; }
+.tile .s { font-size: 12.5px; color: var(--ink-3); }
+.tile.p85 { border-color: var(--accent); }
+.verdict { font-size: 14px; padding: 8px 10px; border-radius: 8px; background: var(--bg); color: var(--ink-2); }
+.verdict b { color: var(--ink); }
+.classes { display: grid; gap: 7px; }
+.crow { display: grid; grid-template-columns: 92px 1fr 48px; gap: 10px; align-items: center; font-size: 13.5px; }
+.crow .track { height: 12px; background: var(--bg); border-radius: 0 4px 4px 0; overflow: hidden; }
+.crow .fill { height: 100%; border-radius: 0 4px 4px 0; }
+.crow .n { text-align: right; color: var(--ink-2); font-family: var(--font-data); font-size: 13px; }
+.chip { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: 0; }
+
+/* Charts */
+.charts { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 18px; }
+svg.chart { width: 100%; height: auto; display: block; overflow: visible; }
+svg.chart text { font-family: var(--font-data); font-size: 11px; fill: var(--ink-3); }
+svg.chart .lbl { fill: var(--ink); font-family: var(--font-body); font-size: 12px; }
+svg.chart .grid { stroke: var(--line); stroke-width: 1; }
+.chart-tip { position: fixed; pointer-events: none; background: var(--ink); color: var(--panel); font: 12.5px var(--font-data);
+  padding: 5px 8px; border-radius: 6px; z-index: 5; }
+
+/* Log + table */
+.log { font: 12.5px/1.55 var(--font-data); background: var(--bg); border-radius: 8px; padding: 10px 12px; overflow-x: auto; white-space: pre; color: var(--ink-2); min-height: 9.5em; }
+.log .over { color: var(--bad); }
+.log .tail { color: var(--warn); }
+.tbl-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; min-width: 640px; }
+th, td { text-align: right; padding: 8px 10px; border-bottom: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+th:first-child, td:first-child { text-align: left; }
+th { font: 600 13px var(--font-display); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); }
+td.city { font-family: var(--font-display); font-weight: 700; font-size: 17px; }
+td.city small { font-family: var(--font-body); font-weight: 400; font-size: 13px; color: var(--ink-2); margin-left: 4px; }
+tr.sel td { background: var(--bg); }
+.pill { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 12.5px; font-family: var(--font-body); }
+.pill.ok { background: color-mix(in srgb, var(--ok) 16%, transparent); color: var(--ok); }
+.pill.bad { background: color-mix(in srgb, var(--bad) 16%, transparent); color: var(--bad); }
+
+footer { font-size: 13px; color: var(--ink-3); display: grid; gap: 4px; }
+
+@media (max-width: 900px) {
+  .main, .charts { grid-template-columns: minmax(0, 1fr); }
+  .tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 520px) {
+  .device { grid-template-columns: minmax(0, 1fr); justify-items: stretch; }
+  .tab { grid-template-columns: 1fr; }
+  .tab .sign { display: none; }
+  .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lamp.blink { animation: none; }
+}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Vehicle speed detector v2 · live demo</div>
+    <h1>Nepal Speed Watch</h1>
+    <p class="lede">Four roadside speed detectors, one in each city. Each one measures every vehicle with two infrared beams 1&nbsp;m apart, works out its speed, length and class, shows the driver their speed, and keeps the survey numbers a traffic engineer needs.</p>
+    <p class="demo-note">Simulated traffic. Sites, limits and volumes are demo settings, not official data.</p>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Detector sites" id="tabs"></nav>
+
+  <section class="main">
+    <div class="card">
+      <div class="site-head">
+        <div class="sign big" id="bigSign" aria-label="speed limit">40</div>
+        <div class="txt">
+          <h2 id="siteName">Kathmandu</h2>
+          <p id="siteRoad"></p>
+        </div>
+        <div class="clock num" id="clock">07:30:00</div>
+      </div>
+
+      <canvas id="road" aria-label="Top view of the road with two detector beams; vehicles pass through"></canvas>
+
+      <div class="device" aria-live="polite">
+        <div class="led-wrap">
+          <div class="cap">तपाईंको गति · Your speed</div>
+          <svg class="led" id="led" viewBox="0 0 168 92" role="img" aria-label="speed display"></svg>
+          <div class="led-unit">KM/H</div>
+        </div>
+        <div class="signs">
+          <div class="lamp slow" id="lampSlow"><i class="dot"></i><b>SLOW DOWN</b><span>बिस्तारै चलाउनुहोस्</span></div>
+          <div class="lamp thanks" id="lampOk"><i class="dot"></i><b>THANK YOU</b><span>धन्यवाद</span></div>
+          <div class="lamp dist" id="lampDist"><i class="dot"></i><b>KEEP DISTANCE</b><span>दूरी कायम राख्नुहोस्</span></div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button class="btn primary" id="playBtn" type="button">Pause</button>
+        <div class="seg" role="group" aria-label="Simulation speed" id="speedSeg">
+          <button type="button" data-x="1" aria-pressed="true">1×</button>
+          <button type="button" data-x="5" aria-pressed="false">5×</button>
+          <button type="button" data-x="20" aria-pressed="false">20×</button>
+        </div>
+        <div class="stepper" aria-label="Speed limit for cars and bikes">
+          SET LIMIT
+          <button type="button" id="limDown" aria-label="Lower limit">−</button>
+          <span class="val" id="limVal">40</span>
+          <button type="button" id="limUp" aria-label="Raise limit">+</button>
+          km/h
+        </div>
+        <button class="btn" id="dayBtn" type="button">Run rest of day</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Today at this site</h3>
+      <div class="tiles">
+        <div class="tile"><span class="k">Vehicles</span><span class="v" id="tVeh">0</span><span class="s" id="tVehS">since 00:00</span></div>
+        <div class="tile"><span class="k">Over the limit</span><span class="v" id="tOver">0</span><span class="s" id="tOverS">0 %</span></div>
+        <div class="tile p85"><span class="k">85th percentile speed</span><span class="v" id="tP85">0<small>km/h</small></span><span class="s">85 % of drivers stay under this</span></div>
+        <div class="tile"><span class="k">Average / top</span><span class="v" id="tAvg">0<small>km/h</small></span><span class="s" id="tTop">top 0 km/h</span></div>
+        <div class="tile"><span class="k">Tailgating (&lt; 2 s)</span><span class="v" id="tTail">0</span><span class="s">KEEP DISTANCE shown</span></div>
+        <div class="tile"><span class="k">Heavy over their limit</span><span class="v" id="tHeavy">0</span><span class="s" id="tHeavyS">bus / truck limit 30</span></div>
+      </div>
+      <p class="verdict" id="verdict"></p>
+      <h3>Vehicle classes</h3>
+      <div class="classes" id="classes"></div>
+    </div>
+  </section>
+
+  <section class="charts">
+    <div class="card">
+      <h3>Speed distribution · vehicles per 5 km/h</h3>
+      <svg class="chart" id="hist" viewBox="0 0 600 240" role="img" aria-label="Speed distribution histogram"></svg>
+    </div>
+    <div class="card">
+      <h3>Vehicles per hour</h3>
+      <svg class="chart" id="hourly" viewBox="0 0 420 240" role="img" aria-label="Vehicles per hour of the day"></svg>
+    </div>
+  </section>
+
+  <section class="card">
+    <h3>Detector log · same CSV format as the real firmware</h3>
+    <div class="log" id="log" aria-label="Latest vehicle records"></div>
+  </section>
+
+  <section class="card">
+    <h3>All four sites, side by side</h3>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Site</th><th>Limit</th><th>Vehicles</th><th>Avg</th><th>p85</th><th>Over limit</th><th>Tailgating</th><th>Limit vs p85</th></tr></thead>
+        <tbody id="cmp"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer>
+    <span>Firmware, wiring, Proteus build steps and the simulator test: projects/15-vehicle-speed-detector in <a href="https://github.com/sprasapradip/proteus-project/tree/main/projects/15-vehicle-speed-detector">sprasapradip/proteus-project</a>.</span>
+    <span>© 2023-2026 Pradip Subedi. All rights reserved. Simulated data for demonstration only.</span>
+  </footer>
+</div>
+
+<script>
+(() => {
+  "use strict";
+
+  // ---------------------------------------------------------------------------
+  // Sites. Demo settings: road choice, limits and traffic shape are examples,
+  // chosen to show different kinds of roads. They are not official figures.
+  // ---------------------------------------------------------------------------
+  const SITES = [
+    { id: "ktm", city: "Kathmandu", ne: "काठमाडौं", road: "Koteshwor, Araniko Highway. Busy urban arterial, motorbikes everywhere.",
+      limit: 40, heavy: 30, peak: 620,
+      profile: [6,3,2,2,4,12,35,72,96,88,74,70,72,70,68,74,86,98,92,70,48,30,18,10],
+      mix: [0.66, 0.29, 0.05], mean: [33, 31, 26], sd: 7, platoon: 0.20 },
+    { id: "pkr", city: "Pokhara", ne: "पोखरा", road: "Lakeside, Baidam Road. Tourist street with people walking beside traffic.",
+      limit: 30, heavy: 25, peak: 300,
+      profile: [4,2,1,1,2,6,14,28,40,48,52,56,58,56,55,58,64,74,88,100,86,60,30,12],
+      mix: [0.55, 0.40, 0.05], mean: [27, 25, 21], sd: 6, platoon: 0.10 },
+    { id: "ctn", city: "Chitwan", ne: "चितवन", road: "Bharatpur, East-West Highway through town. Long-distance buses and trucks.",
+      limit: 50, heavy: 40, peak: 420,
+      profile: [14,10,8,8,12,26,50,74,86,84,80,78,80,78,78,82,88,94,90,76,58,40,28,20],
+      mix: [0.48, 0.30, 0.22], mean: [46, 47, 41], sd: 9, platoon: 0.14 },
+    { id: "htd", city: "Hetauda", ne: "हेटौंडा", road: "Main road near a school, Hetauda. Children crossing at 10:00 and 16:00.",
+      limit: 30, heavy: 25, peak: 260,
+      profile: [3,2,1,1,2,8,24,58,84,92,76,66,70,68,66,90,84,80,64,46,30,18,9,5],
+      mix: [0.60, 0.30, 0.10], mean: [31, 30, 26], sd: 7, platoon: 0.12 },
+  ];
+  const CLASSES = ["BIKE", "CAR", "HEAVY"];
+  const CLASS_LABEL = ["Bike", "Car", "Bus/truck"];
+  const GAP_M = 1.0;                   // beam spacing
+  const START_SEC = 7 * 3600 + 30 * 60; // live view starts at 07:30
+
+  // Seeded random so the demo looks the same each time it opens.
+  function rng(seed) {
+    let s = seed >>> 0;
+    return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; };
+  }
+  function gauss(r) {
+    let u = 0, v = 0;
+    while (u === 0) u = r();
+    while (v === 0) v = r();
+    return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+  }
+
+  // ---------------------------------------------------------------------------
+  // One detector per site. Speed and class are worked out the way the
+  // firmware does it: beam timing for speed, beam occupancy x speed for length.
+  // ---------------------------------------------------------------------------
+  function makeSite(cfg, idx) {
+    const r = rng(1000 + idx * 7919);
+    const st = {
+      cfg, r, limit: cfg.limit, heavyLimit: cfg.heavy,
+      t: 0,                // simulated seconds since 00:00
+      next: 0,             // time of the next arrival
+      lastFront: [-1e9, -1e9],
+      vehicles: [],        // finished records
+      onRoad: [],          // vehicles currently drawn
+      display: null,       // { kmh, until, over }
+      slowUntil: 0, distUntil: 0, okUntil: 0,
+    };
+    st.next = arrivalGap(st, 0);
+    return st;
+  }
+
+  function rateAt(cfg, t) {
+    const h = Math.floor(t / 3600) % 24;
+    return Math.max(cfg.peak * cfg.profile[h] / 100, 4);   // vehicles per hour
+  }
+
+  function arrivalGap(st, t) {
+    const lam = rateAt(st.cfg, t) / 3600;
+    if (st.r() < st.cfg.platoon) return 0.9 + st.r() * 1.6;  // following close behind
+    return Math.max(1.0, -Math.log(1 - st.r()) / lam);
+  }
+
+  function newVehicle(st, t) {
+    const c = st.cfg, r = st.r;
+    const u = r();
+    const cls = u < c.mix[0] ? 0 : u < c.mix[0] + c.mix[1] ? 1 : 2;
+    const h = Math.floor(t / 3600) % 24;
+    const night = h < 6 || h >= 21 ? 6 : 0;            // emptier roads, faster driving
+    let kmh = c.mean[cls] + night + gauss(r) * c.sd;
+    kmh = Math.min(Math.max(kmh, 8), 95);
+    const length = [1.7 + r() * 0.5, 3.8 + r() * 1.0, 8.0 + r() * 4.5][cls];
+    // What the firmware would measure: beam times in microseconds (4 us steps)
+    const v = kmh / 3.6;
+    const dtUs = Math.round(GAP_M / v * 1e6 / 4) * 4;
+    const measured = GAP_M / (dtUs / 1e6) * 3.6;
+    const occ = length / v;
+    const measLen = measured / 3.6 * occ;
+    const mcls = measLen < 2.5 ? 0 : measLen < 6.5 ? 1 : 2;
+    return { cls: mcls, kmh: Math.round(measured * 10) / 10, len: Math.round(measLen * 10) / 10,
+             dir: r() < 0.5 ? "A>B" : "B>A", t };
+  }
+
+  function record(st, v) {
+    const d = v.dir === "A>B" ? 0 : 1;
+    const head = v.t - st.lastFront[d];
+    st.lastFront[d] = v.t;
+    v.headway = head < 60 ? Math.round(head * 100) / 100 : null;
+    v.tail = v.headway !== null && v.headway < 2 && v.kmh >= 20;
+    v.over = v.kmh > (v.cls === 2 ? st.heavyLimit : st.limit);
+    st.vehicles.push(v);
+    return v;
+  }
+
+  // Advance a site to time t (simulated seconds). `live` adds drawable vehicles.
+  function advance(st, t, live) {
+    while (st.next <= t) {
+      const v = record(st, newVehicle(st, st.next));
+      if (live) st.onRoad.push({ v, born: st.next });
+      st.next += arrivalGap(st, st.next);
+    }
+    st.t = t;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Statistics (same definitions as the firmware STATS command)
+  // ---------------------------------------------------------------------------
+  function stats(st) {
+    const vs = st.vehicles, n = vs.length;
+    const speeds = vs.map(v => v.kmh).sort((a, b) => a - b);
+    const pct = p => {
+      if (!n) return 0;
+      const k = (n - 1) * p, lo = Math.floor(k), hi = Math.min(lo + 1, n - 1);
+      return speeds[lo] + (speeds[hi] - speeds[lo]) * (k - lo);
+    };
+    const cls = [0, 0, 0], hours = new Array(24).fill(0), hist = new Array(19).fill(0);
+    let over = 0, tail = 0, heavyOver = 0, sum = 0;
+    for (const v of vs) {
+      cls[v.cls]++; hours[Math.floor(v.t / 3600) % 24]++;
+      hist[Math.min(Math.floor(v.kmh / 5), 18)]++;
+      if (v.over) { over++; if (v.cls === 2) heavyOver++; }
+      if (v.tail) tail++;
+      sum += v.kmh;
+    }
+    return { n, over, tail, heavyOver, cls, hours, hist, avg: n ? sum / n : 0,
+             top: n ? speeds[n - 1] : 0, p85: pct(0.85), p50: pct(0.5) };
+  }
+
+  // ---------------------------------------------------------------------------
+  // State and setup
+  // ---------------------------------------------------------------------------
+  const sites = SITES.map(makeSite);
+  for (const s of sites) advance(s, START_SEC, false);   // the day so far
+  let cur = 0, running = true, speedX = 1;
+  let simT = START_SEC, lastWall = performance.now();
+  const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  const $ = id => document.getElementById(id);
+  const fmtT = t => {
+    t = Math.floor(t) % 86400;
+    const p = x => String(x).padStart(2, "0");
+    return `${p(Math.floor(t / 3600))}:${p(Math.floor(t / 60) % 60)}:${p(t % 60)}`;
+  };
+
+  // Tabs
+  const tabs = $("tabs");
+  SITES.forEach((c, i) => {
+    const b = document.createElement("button");
+    b.className = "tab"; b.type = "button"; b.setAttribute("role", "tab"); b.id = "tab-" + c.id;
+    b.innerHTML = `<span class="sign" aria-label="limit ${c.limit} km/h">${c.limit}</span>
+      <span class="city">${c.city}<small>${c.ne}</small></span>
+      <span class="road">${c.road.split(".")[0]}</span>
+      <span class="live num" id="live-${c.id}"></span>`;
+    b.addEventListener("click", () => select(i));
+    tabs.appendChild(b);
+  });
+
+  function select(i) {
+    cur = i;
+    [...tabs.children].forEach((b, k) => b.setAttribute("aria-selected", k === i ? "true" : "false"));
+    const c = SITES[i], st = sites[i];
+    $("siteName").innerHTML = `${c.city} <span style="font-family:var(--font-body);font-weight:500;font-size:17px;color:var(--ink-2)">${c.ne}</span>`;
+    $("siteRoad").textContent = c.road;
+    $("bigSign").textContent = st.limit;
+    $("limVal").textContent = st.limit;
+    $("tHeavyS").textContent = `bus / truck limit ${st.heavyLimit}`;
+    try { localStorage.setItem("nsw-site", c.id); } catch (e) { /* storage unavailable */ }
+    renderAll(true);
+  }
+
+  // ---------------------------------------------------------------------------
+  // LED seven-segment display (SVG)
+  // ---------------------------------------------------------------------------
+  const SEG = { 0: "abcdef", 1: "bc", 2: "abdeg", 3: "abcdg", 4: "bcfg", 5: "acdfg", 6: "acdefg", 7: "abc", 8: "abcdefg", 9: "abcdfg" };
+  const led = $("led");
+  function segPolys(x) {
+    const w = 40, h = 76, t = 7, y = 8;
+    const H = (x0, y0) => `${x0 + t},${y0} ${x0 + w - t},${y0} ${x0 + w - t / 2},${y0 + t / 2} ${x0 + w - t},${y0 + t} ${x0 + t},${y0 + t} ${x0 + t / 2},${y0 + t / 2}`;
+    const V = (x0, y0) => `${x0},${y0 + t} ${x0 + t / 2},${y0 + t / 2} ${x0 + t},${y0 + t} ${x0 + t},${y0 + h / 2 - t} ${x0 + t / 2},${y0 + h / 2 - t / 2} ${x0},${y0 + h / 2 - t}`;
+    return {
+      a: H(x, y), g: H(x, y + h / 2 - t / 2), d: H(x, y + h - t),
+      f: V(x, y), b: V(x + w - t, y), e: V(x, y + h / 2 - t / 2), c: V(x + w - t, y + h / 2 - t / 2),
+    };
+  }
+  const digits = [10, 62, 114].map(x => {
+    const polys = segPolys(x), els = {};
+    for (const k of "abcdefg") {
+      const p = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+      p.setAttribute("points", polys[k]);
+      led.appendChild(p);
+      els[k] = p;
+    }
+    return els;
+  });
+  function showLed(value, color) {
+    const s = value === null ? "   " : String(Math.round(value)).padStart(3, " ").slice(-3);
+    digits.forEach((els, i) => {
+      const on = SEG[s[i]] || "";
+      for (const k of "abcdefg") els[k].style.fill = on.includes(k) ? color : "var(--led-off)";
+    });
+  }
+  showLed(null, "var(--led-on)");
+
+  // ---------------------------------------------------------------------------
+  // Road canvas
+  // ---------------------------------------------------------------------------
+  const cv = $("road"), ctx = cv.getContext("2d");
+  const ROAD_M = 46;            // metres shown
+  const BEAM_A = 22, BEAM_B = BEAM_A + GAP_M;
+  let tok = {};
+  function readTokens() {
+    const cs = getComputedStyle(document.documentElement);
+    for (const k of ["asphalt", "asphalt-edge", "lane", "beam", "bike", "car", "heavy", "ink-3", "panel"])
+      tok[k] = cs.getPropertyValue("--" + k).trim();
+  }
+  readTokens();
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { readTokens(); renderAll(true); });
+  new MutationObserver(() => { readTokens(); renderAll(true); }).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+
+  function sizeCanvas() {
+    const dpr = window.devicePixelRatio || 1;
+    const w = cv.clientWidth, h = cv.clientHeight;
+    if (cv.width !== Math.round(w * dpr)) { cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); }
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return [w, h];
+  }
+
+  function drawRoad() {
+    const [w, h] = sizeCanvas();
+    const pxm = w / ROAD_M;
+    ctx.fillStyle = tok["asphalt-edge"]; ctx.fillRect(0, 0, w, h);
+    const top = 22, bot = h - 22;
+    ctx.fillStyle = tok.asphalt; ctx.fillRect(0, top, w, bot - top);
+    // lane markings
+    const mid = (top + bot) / 2;
+    ctx.strokeStyle = tok.lane; ctx.lineWidth = 2; ctx.setLineDash([16, 14]);
+    ctx.beginPath(); ctx.moveTo(0, mid); ctx.lineTo(w, mid); ctx.stroke(); ctx.setLineDash([]);
+    ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(0, top + 2); ctx.lineTo(w, top + 2); ctx.moveTo(0, bot - 2); ctx.lineTo(w, bot - 2); ctx.stroke();
+
+    // vehicles
+    const st = sites[cur];
+    for (const o of st.onRoad) {
+      const v = o.v, age = simT - o.born, ms = v.kmh / 3.6;
+      const lenPx = Math.max(v.len * pxm, 8);
+      const laneY = v.dir === "A>B" ? mid + (bot - mid) / 2 : top + (mid - top) / 2;
+      const thick = [8, 15, 19][v.cls];
+      // front reaches the first beam at age 0
+      const dist = age * ms;
+      let xFront;
+      if (v.dir === "A>B") xFront = BEAM_A * pxm + dist * pxm;
+      else xFront = BEAM_B * pxm - dist * pxm;
+      const x = v.dir === "A>B" ? xFront - lenPx : xFront;
+      ctx.fillStyle = tok[["bike", "car", "heavy"][v.cls]];
+      roundRect(x, laneY - thick / 2, lenPx, thick, 3);
+      ctx.fill();
+    }
+    // beams (posts + infrared lines)
+    for (const [m, name] of [[BEAM_A, "A"], [BEAM_B, "B"]]) {
+      const x = m * pxm;
+      ctx.strokeStyle = tok.beam; ctx.lineWidth = 1.5; ctx.setLineDash([3, 3]);
+      ctx.beginPath(); ctx.moveTo(x, top); ctx.lineTo(x, bot); ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle = tok.beam; ctx.fillRect(x - 3, top - 8, 6, 8); ctx.fillRect(x - 3, bot, 6, 8);
+      ctx.fillStyle = tok["ink-3"]; ctx.font = "600 11px 'IBM Plex Mono', monospace";
+      ctx.fillText(name, x + (name === "A" ? -12 : 5), top - 8);
+    }
+    ctx.fillStyle = tok["ink-3"]; ctx.font = "11px 'IBM Plex Mono', monospace";
+    ctx.fillText("beams 1.00 m apart", BEAM_B * pxm + 18, top - 8);
+    ctx.fillText("A>B", w - 34, bot + 15);
+    ctx.fillText("B>A", 6, top - 8);
+  }
+  function roundRect(x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y); ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r); ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h); ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r); ctx.quadraticCurveTo(x, y, x + r, y); ctx.closePath();
+  }
+
+  // ---------------------------------------------------------------------------
+  // Panels
+  // ---------------------------------------------------------------------------
+  function renderStats() {
+    const st = sites[cur], s = stats(st);
+    $("tVeh").textContent = s.n.toLocaleString("en-IN");
+    $("tVehS").textContent = `since 00:00, now ${fmtT(simT).slice(0, 5)}`;
+    $("tOver").textContent = s.over.toLocaleString("en-IN");
+    $("tOverS").textContent = `${s.n ? Math.round(100 * s.over / s.n) : 0} % of vehicles`;
+    $("tP85").innerHTML = `${s.p85.toFixed(0)}<small>km/h</small>`;
+    $("tAvg").innerHTML = `${s.avg.toFixed(0)}<small>km/h</small>`;
+    $("tTop").textContent = `top ${s.top.toFixed(0)} km/h`;
+    $("tTail").textContent = s.tail.toLocaleString("en-IN");
+    $("tHeavy").textContent = s.heavyOver.toLocaleString("en-IN");
+    const gap = s.p85 - st.limit;
+    $("verdict").innerHTML = gap <= 5
+      ? `<b>Limit ${st.limit} fits.</b> The 85th percentile (${s.p85.toFixed(0)} km/h) is close to the limit. The sign and the speed display are doing their job.`
+      : `<b>Limit ${st.limit} is widely ignored.</b> 85 % of drivers go up to ${s.p85.toFixed(0)} km/h. A sign alone won't fix this; the road needs calming (speed humps, narrowing) or enforcement.`;
+    const max = Math.max(...s.cls, 1);
+    $("classes").innerHTML = s.cls.map((n, i) => `
+      <div class="crow"><span><i class="chip" style="background:var(--${["bike", "car", "heavy"][i]})"></i>${CLASS_LABEL[i]}</span>
+      <span class="track"><span class="fill" style="display:block;width:${100 * n / max}%;background:var(--${["bike", "car", "heavy"][i]})"></span></span>
+      <span class="n">${n}</span></div>`).join("");
+    drawHist(s, st);
+    drawHourly(s);
+    return s;
+  }
+
+  function drawHist(s, st) {
+    const svg = $("hist"), W = 600, H = 240, L = 36, R = 10, T = 18, B = 30;
+    const bins = s.hist, max = Math.max(...bins, 1);
+    const yMax = niceMax(max), bw = (W - L - R) / bins.length;
+    const y = v => H - B - (H - T - B) * v / yMax;
+    let out = "";
+    for (const g of ticks(yMax)) out += `<line class="grid" x1="${L}" x2="${W - R}" y1="${y(g)}" y2="${y(g)}"/><text x="${L - 6}" y="${y(g) + 4}" text-anchor="end">${g}</text>`;
+    bins.forEach((n, i) => {
+      if (!n) return;
+      const x = L + i * bw + 1, yy = y(n), hh = H - B - yy;
+      out += `<path d="M${x},${H - B} V${yy + 4} q0,-4 4,-4 H${x + bw - 6} q4,0 4,4 V${H - B}Z" fill="var(--bar)" data-tip="${i * 5}–${i * 5 + 5} km/h: ${n} vehicles"/>`;
+    });
+    for (let k = 0; k <= 90; k += 10) out += `<text x="${L + (k / 5) * bw}" y="${H - B + 16}" text-anchor="middle">${k}</text>`;
+    out += `<text x="${W - R}" y="${H - 4}" text-anchor="end">km/h</text>`;
+    const xs = v => L + (v / 5) * bw;
+    const lim = xs(st.limit), p = xs(s.p85);
+    out += `<line x1="${lim}" x2="${lim}" y1="${T}" y2="${H - B}" stroke="var(--accent)" stroke-width="2" stroke-dasharray="5 4"/>`;
+    out += `<line x1="${p}" x2="${p}" y1="${T}" y2="${H - B}" stroke="var(--ink)" stroke-width="1.5" stroke-dasharray="2 3"/>`;
+    const left = p >= lim;
+    out += `<text class="lbl" x="${lim + (left ? -5 : 5)}" y="${T + 2}" text-anchor="${left ? "end" : "start"}">limit ${st.limit}</text>`;
+    out += `<text class="lbl" x="${p + (left ? 5 : -5)}" y="${T + 2}" text-anchor="${left ? "start" : "end"}">85th pct ${s.p85.toFixed(0)}</text>`;
+    svg.innerHTML = out;
+  }
+
+  function drawHourly(s) {
+    const svg = $("hourly"), W = 420, H = 240, L = 36, R = 6, T = 14, B = 30;
+    const max = Math.max(...s.hours, 1), yMax = niceMax(max), bw = (W - L - R) / 24;
+    const y = v => H - B - (H - T - B) * v / yMax;
+    const nowH = Math.floor(simT / 3600) % 24;
+    let out = "";
+    for (const g of ticks(yMax)) out += `<line class="grid" x1="${L}" x2="${W - R}" y1="${y(g)}" y2="${y(g)}"/><text x="${L - 6}" y="${y(g) + 4}" text-anchor="end">${g}</text>`;
+    s.hours.forEach((n, h) => {
+      if (!n) return;
+      const x = L + h * bw + 1, yy = y(n);
+      const op = h === nowH ? 1 : 0.55;
+      out += `<path d="M${x},${H - B} V${Math.min(yy + 3, H - B)} q0,-3 3,-3 H${x + bw - 5} q3,0 3,3 V${H - B}Z" fill="var(--bar)" fill-opacity="${op}" data-tip="${String(h).padStart(2, "0")}:00–${String(h + 1).padStart(2, "0")}:00: ${n} vehicles"/>`;
+    });
+    for (const h of [0, 6, 12, 18, 23]) out += `<text x="${L + h * bw + bw / 2}" y="${H - B + 16}" text-anchor="middle">${String(h).padStart(2, "0")}</text>`;
+    out += `<text x="${W - R}" y="${H - 4}" text-anchor="end">hour</text>`;
+    svg.innerHTML = out;
+  }
+
+  function niceMax(m) {
+    const p = Math.pow(10, Math.floor(Math.log10(m)));
+    // Steps that divide cleanly into 4 gridlines.
+    for (const k of [1, 1.2, 1.6, 2, 2.4, 3, 4, 5, 6, 8, 10]) if (k * p >= m) return k * p;
+    return 10 * p;
+  }
+  function ticks(m) { return [0, m / 4, m / 2, (3 * m) / 4, m].map(v => Math.round(v)); }
+
+  function renderLog() {
+    const st = sites[cur], last = st.vehicles.slice(-8);
+    const head = "VEHICLE,time,direction,kmh,class,length_m,headway_s,over_limit,tailgating\n";
+    $("log").innerHTML = head + last.map(v => {
+      const line = `VEHICLE,D0 ${fmtT(v.t)},${v.dir},${v.kmh.toFixed(1)},${CLASSES[v.cls]},${v.len.toFixed(1)},${v.headway === null ? "-" : v.headway.toFixed(2)},${v.over ? 1 : 0},${v.tail ? 1 : 0}`;
+      return v.over ? `<span class="over">${line}</span>` : v.tail ? `<span class="tail">${line}</span>` : line;
+    }).join("\n");
+  }
+
+  function renderCompare() {
+    $("cmp").innerHTML = sites.map((st, i) => {
+      const s = stats(st), c = st.cfg, fit = s.p85 - st.limit <= 5;
+      return `<tr class="${i === cur ? "sel" : ""}"><td class="city">${c.city}<small>${c.ne}</small></td>
+        <td class="num">${st.limit}</td><td class="num">${s.n.toLocaleString("en-IN")}</td>
+        <td class="num">${s.avg.toFixed(1)}</td><td class="num">${s.p85.toFixed(1)}</td>
+        <td class="num">${s.n ? Math.round(100 * s.over / s.n) : 0} %</td><td class="num">${s.tail}</td>
+        <td><span class="pill ${fit ? "ok" : "bad"}">${fit ? "fits" : "ignored"}</span></td></tr>`;
+    }).join("");
+    sites.forEach((st, i) => {
+      const el = $("live-" + st.cfg.id);
+      if (el) el.textContent = `${st.vehicles.length.toLocaleString("en-IN")} vehicles`;
+    });
+  }
+
+  function renderDevice() {
+    const st = sites[cur];
+    const d = st.display;
+    const showing = d && simT < d.until;
+    showLed(showing ? d.kmh : null, showing && d.over ? "var(--led-bad)" : "var(--led-on)");
+    const slow = simT < st.slowUntil, dist = simT < st.distUntil, ok = simT < st.okUntil && !slow;
+    $("lampSlow").classList.toggle("on", slow); $("lampSlow").classList.toggle("blink", slow && !reduceMotion);
+    $("lampDist").classList.toggle("on", dist); $("lampDist").classList.toggle("blink", dist && !reduceMotion);
+    $("lampOk").classList.toggle("on", ok);
+  }
+
+  function renderAll() {
+    $("clock").textContent = fmtT(simT);
+    renderStats(); renderLog(); renderCompare(); renderDevice(); drawRoad();
+  }
+
+  // ---------------------------------------------------------------------------
+  // Main loop
+  // ---------------------------------------------------------------------------
+  let lastPanel = 0;
+  function frame(now) {
+    const dt = Math.min((now - lastWall) / 1000, 0.25);
+    lastWall = now;
+    if (running) {
+      simT += dt * speedX;
+      for (let i = 0; i < sites.length; i++) {
+        const st = sites[i], before = st.vehicles.length;
+        advance(st, simT, true);
+        // A vehicle reaching the beams drives the roadside unit.
+        for (const v of st.vehicles.slice(before)) {
+          st.display = { kmh: v.kmh, over: v.over, until: v.t + 5 };
+          if (v.over) st.slowUntil = v.t + 5; else st.okUntil = v.t + 3;
+          if (v.tail) st.distUntil = v.t + 5;
+        }
+        // Forget vehicles that have left the picture.
+        st.onRoad = st.onRoad.filter(o => (simT - o.born) * (o.v.kmh / 3.6) < ROAD_M);
+      }
+    }
+    if (!reduceMotion || now - lastPanel > 1000) drawRoad();
+    renderDevice();
+    if (now - lastPanel > 1000) {
+      lastPanel = now;
+      $("clock").textContent = fmtT(simT);
+      renderStats(); renderLog(); renderCompare();
+    }
+    requestAnimationFrame(frame);
+  }
+
+  // Controls
+  $("playBtn").addEventListener("click", () => {
+    running = !running;
+    $("playBtn").textContent = running ? "Pause" : "Play";
+  });
+  $("speedSeg").addEventListener("click", e => {
+    const b = e.target.closest("button[data-x]");
+    if (!b) return;
+    speedX = Number(b.dataset.x);
+    [...$("speedSeg").children].forEach(x => x.setAttribute("aria-pressed", x === b ? "true" : "false"));
+  });
+  function setLimit(delta) {
+    const st = sites[cur];
+    st.limit = Math.min(80, Math.max(20, st.limit + delta));
+    for (const v of st.vehicles) v.over = v.kmh > (v.cls === 2 ? st.heavyLimit : st.limit);
+    $("limVal").textContent = st.limit; $("bigSign").textContent = st.limit;
+    tabs.children[cur].querySelector(".sign").textContent = st.limit;
+    renderAll();
+  }
+  $("limDown").addEventListener("click", () => setLimit(-5));
+  $("limUp").addEventListener("click", () => setLimit(5));
+  $("dayBtn").addEventListener("click", () => {
+    simT = 86399;
+    for (const st of sites) { advance(st, simT, false); st.onRoad = []; }
+    running = false; $("playBtn").textContent = "Play";
+    renderAll();
+  });
+
+  // Chart tooltips
+  const tip = document.createElement("div");
+  tip.className = "chart-tip"; tip.hidden = true; document.body.appendChild(tip);
+  document.addEventListener("pointermove", e => {
+    const t = e.target.closest && e.target.closest("[data-tip]");
+    if (!t) { tip.hidden = true; return; }
+    tip.textContent = t.getAttribute("data-tip"); tip.hidden = false;
+    tip.style.left = Math.min(e.clientX + 12, innerWidth - tip.offsetWidth - 8) + "px";
+    tip.style.top = (e.clientY - 34) + "px";
+  });
+  addEventListener("resize", () => drawRoad());
+
+  let start = 0;
+  try { const saved = localStorage.getItem("nsw-site"); const k = SITES.findIndex(s => s.id === saved); if (k >= 0) start = k; } catch (e) { /* ignore */ }
+  select(start);
+  requestAnimationFrame(t => { lastWall = t; requestAnimationFrame(frame); });
+})();
+</script>

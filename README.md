@@ -28,7 +28,7 @@ I'm Pradip Subedi, an electrical engineering student from Nepal. Most of these p
 | 12 | [Wind vane + yaw control](projects/12-wind-vane-yaw-control) | 16-point vane, vector-averaged direction, yaw motor with cable-twist limit | New, tested |
 | 13 | [Smart parking system](projects/13-smart-parking-system) | Per-slot sensors, entry/exit barriers, live slot map, never closes on a car | New, tested |
 | 14 | [Railway level crossing](projects/14-railway-level-crossing) | Both directions, two trains at once, long trains, gateman key, stuck-sensor fault | New, tested |
-| 15 | [Vehicle speed detector v2](projects/15-vehicle-speed-detector) | Speed, direction, length and class, tailgating, big speed display, 85th percentile stats, EEPROM violation log, PIN-protected settings, survey report | New, tested |
+| 15 | [Vehicle speed detector v2](projects/15-vehicle-speed-detector) | Speed, direction, length and class, tailgating, big speed display, 85th percentile stats, EEPROM violation log, PIN-protected settings, survey report. Live browser demo for Kathmandu, Pokhara, Chitwan and Hetauda | New, tested |
 
 <p>
   <img src="projects/07-traffic-light-controller/images/01_junction_layout.png" width="32%" alt="traffic junction layout">
