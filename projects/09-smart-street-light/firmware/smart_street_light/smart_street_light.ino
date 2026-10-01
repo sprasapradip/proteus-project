@@ -3,6 +3,9 @@
  *  Smart Street Light (LDR + PIR, dimming LED driver)
  * ============================================================================
  *  Author  : Pradip Subedi (github.com/sprasapradip)
+ *  Copyright (c) 2023-2026 Pradip Subedi. All rights reserved.
+ *              Proprietary - no use, copying or modification without written
+ *              permission. See LICENSE in the repository root.
  *  Board   : Arduino Uno (ATmega328P @ 16 MHz)
  *
  *  A street light that is off in the day, dims itself at night and goes to

@@ -4,6 +4,7 @@
 ![Proteus 8](https://img.shields.io/badge/Proteus-8.x-0b7a75)
 ![Arduino Uno](https://img.shields.io/badge/Arduino-Uno%20%2F%20ATmega328P-00979D)
 ![Projects](https://img.shields.io/badge/projects-10-1f6feb)
+![License](https://img.shields.io/badge/license-All%20rights%20reserved-d62828)
 
 Electronics projects I've designed and simulated in Proteus. They start with my first power supply and op-amp circuits from 2023 and go up to firmware for real installations, like the traffic controller for 8 junctions. Every microcontroller project comes with its source, a ready HEX file for Proteus, wiring diagrams and an automatic simulator test.
 
@@ -90,8 +91,18 @@ The Arduino core (1.8.6) and every library are pinned to exact versions in `tool
 
 In October 2026 I cleaned this repo up. I gave every project its own numbered folder with clear file names, and removed the Proteus autosaves, backups, per-PC workspace files and autorouter scratch files. A `.gitignore` now keeps them out. Nothing is really lost: the repo exactly as it was before the cleanup is commit [`7db3a51`](https://github.com/sprasapradip/proteus-project/tree/7db3a51), and `git checkout 7db3a51` brings it all back.
 
+## License
+
+Copyright (c) 2023-2026 Pradip Subedi. **All rights reserved.**
+
+This is not open source. You can look at it here on GitHub, but you may not copy, modify, flash, install, sell or reuse any part of it (code, firmware, Proteus files, PCB layouts, diagrams or documentation) without my written permission. See [LICENSE](LICENSE) for the full terms.
+
+Third-party libraries and models used by these projects keep their own licenses. They're listed in [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
+
+If you want to use something from here for study, a product or an installation, ask me first through GitHub. I'm usually happy to talk about it.
+
 ## Author
 
 Pradip Subedi ([@sprasapradip](https://github.com/sprasapradip)), electrical engineer, Nepal.
 
-For project work or questions, open an issue on this repo.
+For project work, licensing or questions, open an issue on this repo.

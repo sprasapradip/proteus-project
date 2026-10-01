@@ -3,6 +3,9 @@
  *  Gas / Smoke Detector with SMS alert  (v2)
  * ============================================================================
  *  Author  : Pradip Subedi (github.com/sprasapradip)
+ *  Copyright (c) 2023-2026 Pradip Subedi. All rights reserved.
+ *              Proprietary - no use, copying or modification without written
+ *              permission. See LICENSE in the repository root.
  *  Board   : Arduino Uno (ATmega328P @ 16 MHz)
  *
  *  Sensors : MQ-2 (LPG / smoke) on A0, MQ-3 (alcohol / vapour) on A1

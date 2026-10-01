@@ -3,6 +3,9 @@
  *  DC Power & Energy Meter with protection relay
  * ============================================================================
  *  Author  : Pradip Subedi (github.com/sprasapradip)
+ *  Copyright (c) 2023-2026 Pradip Subedi. All rights reserved.
+ *              Proprietary - no use, copying or modification without written
+ *              permission. See LICENSE in the repository root.
  *  Board   : Arduino Uno (ATmega328P @ 16 MHz)
  *
  *  For solar / battery / DC supply work: shows volts, amps, watts and

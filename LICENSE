@@ -1,0 +1,81 @@
+PROPRIETARY LICENSE - ALL RIGHTS RESERVED
+
+Copyright (c) 2023-2026 Pradip Subedi (GitHub: sprasapradip).
+All rights reserved.
+
+1. OWNERSHIP
+
+This repository and everything in it is the exclusive property of the
+copyright holder named above. "The Work" means all of it: source code,
+firmware, compiled HEX and ELF files, Proteus design files, schematics,
+PCB layouts, diagrams, images, test code, build scripts and documentation.
+
+The only exception is the third-party material listed in
+THIRD-PARTY-NOTICES.md. That material remains under its own license and is
+not covered by this one.
+
+2. NO LICENSE GRANTED
+
+No right or license of any kind is granted to you, whether expressly, by
+implication, by estoppel or otherwise. Without the prior written permission
+of the copyright holder, you may not:
+
+  a) copy, reproduce, download for reuse, mirror or redistribute the Work or
+     any part of it, in source, compiled or any other form;
+  b) modify, adapt, translate, port or build derivative works from the Work,
+     including partial or reworked copies of the code, circuits or PCB
+     layouts;
+  c) use the Work, in whole or in part, in any product, device, installation,
+     service, tender, bid, training course or publication, whether
+     commercial, governmental, educational or non-profit;
+  d) flash, program or install any firmware from the Work onto any device
+     other than for privately viewing it in a simulator;
+  e) sell, license, sublicense, rent, lease, lend or otherwise make the Work
+     available to any other person or organisation;
+  f) remove, hide or alter this notice, any copyright notice or any author
+     attribution in the Work;
+  g) use the Work, or any part of it, to train or fine-tune machine-learning
+     or AI models, or to build datasets.
+
+3. PUBLIC VIEWING ON GITHUB
+
+This repository may be publicly visible on GitHub. Under GitHub's Terms of
+Service, GitHub users may view it and fork it within GitHub. Viewing or
+forking does not grant any right listed in section 2. A fork carries no
+permission to use, modify, distribute or install the Work.
+
+4. PERMISSION
+
+To request permission, contact the copyright holder through
+https://github.com/sprasapradip. Permission is valid only if it is given in
+writing (including e-mail) by the copyright holder, and only for the people,
+purpose, projects, sites and period stated in it. Any permission ends
+automatically if its conditions are broken.
+
+5. NO WARRANTY
+
+THE WORK IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, ACCURACY, SAFETY AND NON-INFRINGEMENT.
+
+6. LIMITATION OF LIABILITY
+
+TO THE MAXIMUM EXTENT ALLOWED BY LAW, THE COPYRIGHT HOLDER IS NOT LIABLE
+FOR ANY CLAIM, DAMAGE, INJURY, LOSS OF LIFE, PROPERTY DAMAGE, EQUIPMENT
+FAILURE, LOSS OF DATA OR OTHER LIABILITY, WHETHER IN CONTRACT, TORT OR
+OTHERWISE, ARISING FROM OR CONNECTED WITH THE WORK OR ITS USE.
+
+This includes, without limitation, traffic signal, gas detection, pump
+control, power and lighting installations built from or inspired by the
+Work. Anyone given permission to build or install a device based on the Work
+is fully responsible for its safe design, testing, professional
+installation, regulatory approval and compliance with local laws and
+standards.
+
+7. ENFORCEMENT
+
+Any use of the Work outside the terms above infringes the copyright
+holder's rights and may lead to civil and criminal action under the
+Copyright Act, 2059 (2002) of Nepal, the laws of the country where the
+infringement takes place, and applicable international treaties, including
+the Berne Convention.

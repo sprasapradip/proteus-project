@@ -3,6 +3,9 @@
  *  Water Tank Level Controller with pump protection
  * ============================================================================
  *  Author  : Pradip Subedi (github.com/sprasapradip)
+ *  Copyright (c) 2023-2026 Pradip Subedi. All rights reserved.
+ *              Proprietary - no use, copying or modification without written
+ *              permission. See LICENSE in the repository root.
  *  Board   : Arduino Uno (ATmega328P @ 16 MHz)
  *
  *  The usual Nepali house setup: an underground sump (or boring) and a
