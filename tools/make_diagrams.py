@@ -116,6 +116,52 @@ def all_wiring():
             ("D8", "relay driver -> load", RED), ("D9", "buzzer", YEL), ("D13", "trip LED", RED)],
            "Put a 5.1 V zener across the 22k resistor so a wrong input can't reach the ADC.")
 
+    wiring("11-wind-turbine-controller", "wiring.png",
+           "Wind turbine controller wiring",
+           [("D2", "anemometer reed switch to GND", BLU), ("D3", "rotor hall sensor", BLU),
+            ("D4", "manual STOP switch to GND", GRY), ("A0", "battery 100k / 22k divider", ORG),
+            ("A1", "generator DC 100k / 10k divider", ORG)],
+           [("D7", "brake relay driver (HIGH = run)", RED), ("D9", "dump load MOSFET (PWM)", RED),
+            ("D13", "status LED", GRN), ("D12 D11", "LCD RS, EN", PUR),
+            ("D10 D8 D6 D5", "LCD D4..D7", PUR)],
+           "Brake relay NC contacts short the generator: power loss = turbine braked. "
+           "Dump load resistor sized for full turbine power.")
+
+    wiring("12-wind-vane-yaw-control", "wiring.png",
+           "Wind vane + yaw controller wiring",
+           [("A0", "wind vane to GND, 10k to 5 V", BLU), ("A1", "nacelle 10-turn pot wiper", ORG),
+            ("D4", "PARK / furl switch to GND", GRY)],
+           [("D5", "L298 IN1 (clockwise)", RED), ("D6", "L298 IN2 (counter-clockwise)", RED),
+            ("D9", "L298 ENA (PWM soft start)", RED), ("D13", "status LED", GRN),
+            ("D12 D11", "LCD RS, EN", PUR), ("D10 D8 D3 D2", "LCD D4..D7", PUR)],
+           "Pot centre (2.5 V) = nacelle facing north. Full scale = -270 .. +270 deg.")
+
+    wiring("13-smart-parking-system", "wiring.png",
+           "Smart parking system wiring",
+           [("D2..D7", "slot 1..6 IR sensors (LOW = car)", BLU),
+            ("A0", "entry IR sensor", BLU), ("A1", "exit IR sensor", BLU)],
+           [("D9", "entry barrier servo", PUR), ("D10", "exit barrier servo", PUR),
+            ("D8", "buzzer", YEL), ("D13", "FULL lamp", RED),
+            ("D12 D11", "LCD RS, EN", GRY), ("A2..A5", "LCD D4..D7", GRY)],
+           "Power the servos from a separate 5 V / 2 A supply, common GND with the Arduino.")
+
+    wiring("14-railway-level-crossing", "wiring.png",
+           "Railway level crossing wiring",
+           [("D2", "west approach sensor", BLU), ("D3", "east approach sensor", BLU),
+            ("D4", "island sensor (at the road)", BLU), ("D12", "gateman key switch", GRY)],
+           [("D5", "road red light A", RED), ("D6", "road red light B", RED),
+            ("D7", "bell / buzzer", YEL), ("D9", "barrier servo / motor driver", PUR),
+            ("D13", "status LED", GRN)],
+           "Approach sensors go far enough out that the barrier is down well before the train arrives.")
+
+    wiring("15-vehicle-speed-detector", "wiring.png",
+           "Vehicle speed detector wiring",
+           [("D2", "IR beam A receiver (LOW = broken)", BLU), ("D3", "IR beam B receiver", BLU),
+            ("D7", "RESET counters button", GRY)],
+           [("D8", "green OK lamp", GRN), ("D9", "buzzer", YEL), ("D10", "SLOW DOWN sign driver", RED),
+            ("D13", "status LED", GRN), ("D12 D11", "LCD RS, EN", PUR), ("A0..A3", "LCD D4..D7", PUR)],
+           "Beams exactly 1.00 m apart (set BEAM_GAP_M), at bumper height, across the lane.")
+
 
 # ---------------------------------------------------------------------------
 #  Reference schematics (analog projects)

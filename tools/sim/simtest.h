@@ -96,6 +96,18 @@ __attribute__((unused)) static void pulse_watch(int pin) {
                           pulse_edge, &sim_pulse);
 }
 
+/* Extra watchers when a test needs more than one servo signal. */
+__attribute__((unused)) static Pulse *pulse_watch_extra(int pin) {
+  static Pulse pool[4];
+  static int used;
+  if (used >= 4) { fprintf(stderr, "too many pulse watchers\n"); exit(2); }
+  Pulse *p = &pool[used++];
+  p->pin = pin;
+  avr_irq_register_notify(avr_io_getirq(sim, AVR_IOCTL_IOPORT_GETIRQ(port_of(pin)), bit_of(pin)),
+                          pulse_edge, p);
+  return p;
+}
+
 /* ---- run control -------------------------------------------------------- */
 typedef void (*sim_sampler)(unsigned long now_ms);
 static sim_sampler sim_on_ms;

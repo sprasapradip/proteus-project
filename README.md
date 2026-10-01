@@ -3,12 +3,12 @@
 [![firmware](https://github.com/sprasapradip/proteus-project/actions/workflows/firmware.yml/badge.svg)](https://github.com/sprasapradip/proteus-project/actions/workflows/firmware.yml)
 ![Proteus 8](https://img.shields.io/badge/Proteus-8.x-0b7a75)
 ![Arduino Uno](https://img.shields.io/badge/Arduino-Uno%20%2F%20ATmega328P-00979D)
-![Projects](https://img.shields.io/badge/projects-10-1f6feb)
+![Projects](https://img.shields.io/badge/projects-15-1f6feb)
 ![License](https://img.shields.io/badge/license-All%20rights%20reserved-d62828)
 
 Electronics projects I've designed and simulated in Proteus. They start with my first power supply and op-amp circuits from 2023 and go up to firmware for real installations, like the traffic controller for 8 junctions. Every microcontroller project comes with its source, a ready HEX file for Proteus, wiring diagrams and an automatic simulator test.
 
-I'm Pradip Subedi, an electrical engineering student from Nepal. Most of these projects solve problems I actually see around me: water tanks on every roof, load shedding, LPG in every kitchen, and junctions with no signals.
+I'm Pradip Subedi, an electrical engineering student from Nepal. Most of these projects solve problems I actually see around me: water tanks on every roof, load shedding, LPG in every kitchen, junctions with no signals, windy ridges with no grid, and growing city roads that need parking, safe rail crossings and slower traffic.
 
 ## Projects
 
@@ -24,9 +24,15 @@ I'm Pradip Subedi, an electrical engineering student from Nepal. Most of these p
 | 08 | [Water tank level controller](projects/08-water-tank-level-controller) | 4-level probes, sump dry-run, no-rise and max-run protection, LCD | New, tested |
 | 09 | [Smart street light](projects/09-smart-street-light) | LDR + PIR, dusk/dawn filtering, motion boost, late-night dimming | New, tested |
 | 10 | [DC power & energy meter](projects/10-dc-power-energy-meter) | V, A, W, Wh, CSV log, OV/OC/short/low-battery cut-off | New, tested |
+| 11 | [Wind turbine controller](projects/11-wind-turbine-controller) | Wind speed, rpm, battery; dump-load diversion; fail-safe brake on storm / over-speed | New, tested |
+| 12 | [Wind vane + yaw control](projects/12-wind-vane-yaw-control) | 16-point vane, vector-averaged direction, yaw motor with cable-twist limit | New, tested |
+| 13 | [Smart parking system](projects/13-smart-parking-system) | Per-slot sensors, entry/exit barriers, live slot map, never closes on a car | New, tested |
+| 14 | [Railway level crossing](projects/14-railway-level-crossing) | Both directions, two trains at once, long trains, gateman key, stuck-sensor fault | New, tested |
+| 15 | [Vehicle speed detector](projects/15-vehicle-speed-detector) | Two IR beams, µs timing, SLOW DOWN sign, traffic survey CSV | New, tested |
 
 <p>
   <img src="projects/07-traffic-light-controller/images/01_junction_layout.png" width="32%" alt="traffic junction layout">
+  <img src="projects/11-wind-turbine-controller/images/wiring.png" width="32%" alt="wind turbine controller wiring">
   <img src="projects/08-water-tank-level-controller/images/wiring.png" width="32%" alt="water level controller wiring">
   <img src="projects/01-5v-regulated-power-supply/images/reference-schematic.png" width="32%" alt="5 V power supply schematic">
 </p>
@@ -63,7 +69,7 @@ git clone https://github.com/sprasapradip/proteus-project.git
 
 For an analog project (01 to 04), open the `.pdsprj` in its `proteus/` folder and press Run.
 
-For an Arduino project (05 to 10), open the project's README. Either the `.pdsprj` already points at the HEX, or the README tells you which HEX to put in the Arduino's **Program File** property. The `_sim_x5` / `_sim_x10` HEX files run the long timers faster, so a demo doesn't take 20 minutes.
+For an Arduino project (05 to 15), open the project's README. Either the `.pdsprj` already points at the HEX, or the README tells you which HEX to put in the Arduino's **Program File** property. The `_sim_x5` / `_sim_x10` HEX files run the long timers faster, so a demo doesn't take 20 minutes.
 
 To flash a real board:
 

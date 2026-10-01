@@ -43,6 +43,27 @@ M="$P/10-dc-power-energy-meter"
 "$B" "$M/firmware/dc_power_meter/dc_power_meter.ino" "$OUT/meter.hex" >/dev/null
 run dc-meter "$M/test/sim_test.c" "$OUT/meter.elf"
 
+X="$P/11-wind-turbine-controller"
+"$B" "$X/firmware/wind_turbine_controller/wind_turbine_controller.ino" "$OUT/turbine.hex" \
+     -DTIME_SCALE_PERCENT=10 >/dev/null
+run wind-turbine "$X/test/sim_test.c" "$OUT/turbine.elf"
+
+X="$P/12-wind-vane-yaw-control"
+"$B" "$X/firmware/wind_vane_yaw/wind_vane_yaw.ino" "$OUT/vane.hex" -DTIME_SCALE_PERCENT=10 >/dev/null
+run wind-vane-yaw "$X/test/sim_test.c" "$OUT/vane.elf"
+
+X="$P/13-smart-parking-system"
+"$B" "$X/firmware/smart_parking/smart_parking.ino" "$OUT/parking.hex" >/dev/null
+run smart-parking "$X/test/sim_test.c" "$OUT/parking.elf"
+
+X="$P/14-railway-level-crossing"
+"$B" "$X/firmware/level_crossing/level_crossing.ino" "$OUT/crossing.hex" -DTIME_SCALE_PERCENT=10 >/dev/null
+run level-crossing "$X/test/sim_test.c" "$OUT/crossing.elf"
+
+X="$P/15-vehicle-speed-detector"
+"$B" "$X/firmware/speed_detector/speed_detector.ino" "$OUT/speed.hex" >/dev/null
+run speed-detector "$X/test/sim_test.c" "$OUT/speed.elf"
+
 echo
 if [ ${#FAILED[@]} -eq 0 ]; then
   echo "ALL SIMULATOR TESTS PASSED"

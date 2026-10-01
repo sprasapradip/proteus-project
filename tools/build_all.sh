@@ -39,4 +39,28 @@ echo "== 10 DC power & energy meter"
 M="$P/10-dc-power-energy-meter/firmware"
 "$B" "$M/dc_power_meter/dc_power_meter.ino" "$M/build/dc_power_meter.hex"
 
+echo "== 11 wind turbine controller"
+X="$P/11-wind-turbine-controller/firmware"
+"$B" "$X/wind_turbine_controller/wind_turbine_controller.ino" "$X/build/wind_turbine_controller.hex"
+"$B" "$X/wind_turbine_controller/wind_turbine_controller.ino" "$X/build/wind_turbine_controller_sim_x10.hex" \
+     -DTIME_SCALE_PERCENT=10
+
+echo "== 12 wind vane + yaw control"
+X="$P/12-wind-vane-yaw-control/firmware"
+"$B" "$X/wind_vane_yaw/wind_vane_yaw.ino" "$X/build/wind_vane_yaw.hex"
+"$B" "$X/wind_vane_yaw/wind_vane_yaw.ino" "$X/build/wind_vane_yaw_sim_x10.hex" -DTIME_SCALE_PERCENT=10
+
+echo "== 13 smart parking"
+X="$P/13-smart-parking-system/firmware"
+"$B" "$X/smart_parking/smart_parking.ino" "$X/build/smart_parking.hex"
+
+echo "== 14 railway level crossing"
+X="$P/14-railway-level-crossing/firmware"
+"$B" "$X/level_crossing/level_crossing.ino" "$X/build/level_crossing.hex"
+"$B" "$X/level_crossing/level_crossing.ino" "$X/build/level_crossing_sim_x10.hex" -DTIME_SCALE_PERCENT=10
+
+echo "== 15 vehicle speed detector"
+X="$P/15-vehicle-speed-detector/firmware"
+"$B" "$X/speed_detector/speed_detector.ino" "$X/build/speed_detector.hex"
+
 echo "all firmware built"
