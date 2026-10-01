@@ -103,6 +103,6 @@ If you want to use something from here for study, a product or an installation, 
 
 ## Author
 
-Pradip Subedi ([@sprasapradip](https://github.com/sprasapradip)), electrical engineer, Nepal.
+Pradip Subedi ([@sprasapradip](https://github.com/sprasapradip)), electrical engineering student, Nepal.
 
 For project work, licensing or questions, open an issue on this repo.
