@@ -8,7 +8,7 @@
 
 Electronics projects I've designed and simulated in Proteus. They start with my first power supply and op-amp circuits from 2023 and go up to firmware for real installations, like the traffic controller for 8 junctions. Every microcontroller project comes with its source, a ready HEX file for Proteus, wiring diagrams and an automatic simulator test.
 
-I'm Pradip Subedi, an electrical engineer from Nepal. Most of these projects solve problems I actually see around me: water tanks on every roof, load shedding, LPG in every kitchen, and junctions with no signals.
+I'm Pradip Subedi, an electrical engineering student from Nepal. Most of these projects solve problems I actually see around me: water tanks on every roof, load shedding, LPG in every kitchen, and junctions with no signals.
 
 ## Projects
 
@@ -101,7 +101,7 @@ Third-party libraries and models used by these projects keep their own licenses.
 
 If you want to use something from here for study, a product or an installation, ask me first through GitHub. I'm usually happy to talk about it.
 
-## Author
+## Author 
 
 Pradip Subedi ([@sprasapradip](https://github.com/sprasapradip)), electrical engineering student, Nepal.
 
