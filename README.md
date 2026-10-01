@@ -88,7 +88,7 @@ The Arduino core (1.8.6) and every library are pinned to exact versions in `tool
 
 ## About the 2023 files
 
-In October 2026 I cleaned this repo up. I gave every project its own numbered folder with clear file names, and removed the Proteus autosaves, backups, per-PC workspace files and autorouter scratch files. A `.gitignore` now keeps them out. Nothing is really lost: the repo exactly as it was is tagged as [`archive-2023-original`](https://github.com/sprasapradip/proteus-project/tree/archive-2023-original).
+In October 2026 I cleaned this repo up. I gave every project its own numbered folder with clear file names, and removed the Proteus autosaves, backups, per-PC workspace files and autorouter scratch files. A `.gitignore` now keeps them out. Nothing is really lost: the repo exactly as it was before the cleanup is commit [`7db3a51`](https://github.com/sprasapradip/proteus-project/tree/7db3a51), and `git checkout 7db3a51` brings it all back.
 
 ## Author
 

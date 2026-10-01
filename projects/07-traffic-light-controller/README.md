@@ -2,7 +2,7 @@
 
 This is the controller I'm building for 8 junctions. Every junction is a "+" cross road, so each one has 4 signal heads (North, East, South, West) and one cabinet with an Arduino Uno. All 8 boxes run the same firmware. The only thing that changes from site to site is `SITE_ID` (1 to 8), which picks that junction's timings.
 
-The first version from July 2023 (and its autosave backups) was removed in the repo cleanup. It's still in git history under the tag `archive-2023-original`.
+The first version from July 2023 (and its autosave backups) was removed in the repo cleanup. It's still in git history at commit `7db3a51`.
 
 ![junction layout](images/01_junction_layout.png)
 
