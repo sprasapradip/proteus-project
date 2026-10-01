@@ -31,8 +31,10 @@ To clone this repository, open a terminal or command prompt and execute the foll
 - Open the Proteus project file (.prj) in Proteus.
 - You can now simulate the PCB flasher and rectifier circuits.
 
-### Project-3: traffic light controller
-In this project, we have developed a PCB (Printed Circuit Board) design that includes a 3D visualizer and circuit simulation. The purpose of this project is to provide a comprehensive view of the PCB layout along with the ability to simulate the circuit and observe its behavior.
+### Project-3: Traffic light controller (4-way junction, 8 sites)
+Version 2 of my traffic light controller. One Arduino Uno runs one "+" cross road with 4 signal heads, plus pedestrian lamps, night flash and an emergency all-red hold. The same firmware runs on all 8 junctions, and only `SITE_ID` changes. The folder has the Arduino sketch, ready HEX files for each site, the Proteus project, PNG diagrams, a simulator safety test, and an installation guide for the 4 poles at each junction.
+
+See [traffic-light-controller/README.md](traffic-light-controller/README.md) to get started.
 
 ### Repository Link: [traffic-light-controller](https://github.com/sprasapradip/proteus-project/tree/main/traffic-light-controller)
 
@@ -66,6 +68,7 @@ To clone this repository, open a terminal or command prompt and execute the foll
 
 ```bash
 git clone https://github.com/sprasapradip/proteus-project.git
+```
 
 ## Contributing
 If you want to contribute to this repository or report any issues, feel free to create a pull request or raise an issue on the respective project's GitHub page.

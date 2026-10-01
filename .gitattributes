@@ -1,0 +1,3 @@
+*.pdsprj binary
+*.pdsbak binary
+*.hex text eol=lf
