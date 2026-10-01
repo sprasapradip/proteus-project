@@ -1,82 +1,97 @@
-# Proteus Projects
-Welcome to the Proteus Projects repository! This repository contains two projects designed and simulated using Proteus:
+# Proteus projects
 
-## Project-1: PCB Design 3D Visualizer & Circuit Simulation
-In this project, we have developed a PCB (Printed Circuit Board) design that includes a 3D visualizer and circuit simulation. The purpose of this project is to provide a comprehensive view of the PCB layout along with the ability to simulate the circuit and observe its behavior.
+[![firmware](https://github.com/sprasapradip/proteus-project/actions/workflows/firmware.yml/badge.svg)](https://github.com/sprasapradip/proteus-project/actions/workflows/firmware.yml)
+![Proteus 8](https://img.shields.io/badge/Proteus-8.x-0b7a75)
+![Arduino Uno](https://img.shields.io/badge/Arduino-Uno%20%2F%20ATmega328P-00979D)
+![Projects](https://img.shields.io/badge/projects-10-1f6feb)
 
-### Repository Link: [PCB Design ](https://github.com/sprasapradip/proteus-project/tree/main/Project-1)
-## Project-2: PCB Flasher & Rectifier
-Project-2 involves the design and simulation of a PCB flasher and rectifier. The PCB flasher circuit is used to control the blinking of an LED or any other compatible component, while the rectifier circuit is used to convert AC (Alternating Current) to DC (Direct Current).
+Electronics projects I've designed and simulated in Proteus. They start with my first power supply and op-amp circuits from 2023 and go up to firmware for real installations, like the traffic controller for 8 junctions. Every microcontroller project comes with its source, a ready HEX file for Proteus, wiring diagrams and an automatic simulator test.
 
-### Repository Link: [PCB Flasher & Rectifier](https://github.com/sprasapradip/proteus-project/tree/main/Project-2)
-# Getting Started
-To get started with these projects, follow the instructions below.
+I'm Pradip Subedi, an electrical engineer from Nepal. Most of these projects solve problems I actually see around me: water tanks on every roof, load shedding, LPG in every kitchen, and junctions with no signals.
 
-## Prerequisites
-To simulate and visualize the projects, you will need to have Proteus installed on your system. Proteus is a powerful software tool used for electronic circuit design and simulation. You can download and install Proteus from the [Labcenter Electronics](https://www.labcenter.com/) website.
-## Clone the Repository
-To clone this repository, open a terminal or command prompt and execute the following command:
-   ```bash
-   git clone https://github.com/sprasapradip/proteus-project.git
+## Projects
+
+| # | Project | What's inside | Status |
+|---|---|---|---|
+| 01 | [5 V regulated power supply](projects/01-5v-regulated-power-supply) | Transformer, bridge, 7805. Simulation + 2 PCB layouts with 3D view | Schematic, PCB. Capacitor values need fixing (see README) |
+| 02 | [Op-amp LED flasher](projects/02-opamp-led-flasher) | LM741 astable, 9 V, PCB | Schematic, PCB |
+| 03 | [SCR latch circuit](projects/03-scr-latch-circuit) | Thyristor latch with trigger and reset, metered version | Schematic, PCB |
+| 04 | [8051 7-segment display](projects/04-8051-7segment-display) | 80C51 multiplexing 8 digits | Schematic. Firmware missing |
+| 05 | [LED matrix scrolling display](projects/05-led-matrix-scrolling-display) | Arduino + MAX7219 chain, MD_Parola, serial message input | Runs in Proteus |
+| 06 | [Gas / smoke detector with SMS](projects/06-gas-smoke-detector-gsm) | MQ-2, MQ-3, SIM900, exhaust fan, gas valve servo | Firmware v2, tested |
+| 07 | [Traffic light controller, 8 sites](projects/07-traffic-light-controller) | 4-way junction, conflict monitor, pedestrian, night, emergency, field install guide | Firmware v2, tested |
+| 08 | [Water tank level controller](projects/08-water-tank-level-controller) | 4-level probes, sump dry-run, no-rise and max-run protection, LCD | New, tested |
+| 09 | [Smart street light](projects/09-smart-street-light) | LDR + PIR, dusk/dawn filtering, motion boost, late-night dimming | New, tested |
+| 10 | [DC power & energy meter](projects/10-dc-power-energy-meter) | V, A, W, Wh, CSV log, OV/OC/short/low-battery cut-off | New, tested |
+
+<p>
+  <img src="projects/07-traffic-light-controller/images/01_junction_layout.png" width="32%" alt="traffic junction layout">
+  <img src="projects/08-water-tank-level-controller/images/wiring.png" width="32%" alt="water level controller wiring">
+  <img src="projects/01-5v-regulated-power-supply/images/reference-schematic.png" width="32%" alt="5 V power supply schematic">
+</p>
+
+## Repository layout
+
 ```
-## Running the Projects
-###  Project-1: PCB Design 3D Visualizer & Circuit Simulation
-- Open Proteus software.
-- Navigate to the Project-1 folder in the Proteus Projects repository.
-- Open the Proteus project file (.prj) in Proteus.
-- You can now visualize the 3D PCB design and simulate the circuit.
-### Project-2: PCB Flasher & Rectifier
-- Open Proteus software.
-- Navigate to the Project-2 folder in the Proteus Projects repository.
-- Open the Proteus project file (.prj) in Proteus.
-- You can now simulate the PCB flasher and rectifier circuits.
+proteus-project/
+├── projects/
+│   └── NN-project-name/
+│       ├── README.md          what it does, how to run it, design notes
+│       ├── proteus/           .pdsprj files (and anything they load)
+│       ├── firmware/
+│       │   ├── <sketch>/      Arduino source (+ libs.txt if it needs libraries)
+│       │   └── build/         ready HEX files for Proteus or a real board
+│       ├── images/            wiring diagrams and schematics (PNG)
+│       └── test/sim_test.c    simulator test
+├── tools/
+│   ├── build_firmware.sh      sketch -> HEX, pinned Arduino core and libraries
+│   ├── build_all.sh           rebuilds every HEX in the repo
+│   ├── test_all.sh            runs every simulator test
+│   ├── make_diagrams.py       redraws the PNG diagrams
+│   └── sim/simtest.h          small simavr helper the tests share
+└── .github/workflows/         CI: build everything and run the tests on every push
+```
 
-### Project-3: Traffic light controller (4-way junction, 8 sites)
-Version 2 of my traffic light controller. One Arduino Uno runs one "+" cross road with 4 signal heads, plus pedestrian lamps, night flash and an emergency all-red hold. The same firmware runs on all 8 junctions, and only `SITE_ID` changes. The folder has the Arduino sketch, ready HEX files for each site, the Proteus project, PNG diagrams, a simulator safety test, and an installation guide for the 4 poles at each junction.
+## Getting started
 
-See [traffic-light-controller/README.md](traffic-light-controller/README.md) to get started.
-
-### Repository Link: [traffic-light-controller](https://github.com/sprasapradip/proteus-project/tree/main/traffic-light-controller)
-
-
-
-
-### Project-4: Scoring Board using Arduino in Proteus
-Welcome to the Scoring Board using Arduino in Proteus repository! This project demonstrates a simple scoring board system implemented with an Arduino microcontroller and simulated using Proteus.
-
-## Project Overview
-The Scoring Board project aims to create a basic electronic scoring system that can be used for various games, sports, or events. The system utilizes an Arduino board to keep track of scores and displays the scores on a simulated display in Proteus.
-
-### Repository Link: [Scoring Board](https://github.com/sprasapradip/proteus-project/tree/main/scorring%20board)
-## Features
-- Keep track of two teams' scores in real-time.
-- Simulated display of scores using Proteus.
-- Simple and user-friendly interface.
-
-## Getting Started
-To get started with this project, follow the instructions below.
-
-### Prerequisites
-To simulate the project, you will need to have Proteus and Arduino IDE installed on your system. If you haven't installed them yet, you can download and install Proteus from the [Labcenter Electronics](https://www.labcenter.com/) website and Arduino IDE from the [Arduino website](https://www.arduino.cc/en/software).
-
-
-## Project Overview
-The traffic light controller project aims to simulate the operation of a traffic signal system, including multiple traffic lights for different directions and pedestrian signals. The controller follows the standard traffic signal sequence to regulate the traffic and pedestrian movements effectively.
-
-### Clone the Repository
-To clone this repository, open a terminal or command prompt and execute the following command:
+You need Proteus 8 (8.13 or newer recommended) from [Labcenter](https://www.labcenter.com/).
 
 ```bash
 git clone https://github.com/sprasapradip/proteus-project.git
 ```
 
-## Contributing
-If you want to contribute to this repository or report any issues, feel free to create a pull request or raise an issue on the respective project's GitHub page.
+For an analog project (01 to 04), open the `.pdsprj` in its `proteus/` folder and press Run.
 
-## About the Author
-These projects were created and maintained by [sprasapradip](https://github.com/sprasapradip). Please reach out to the author for any questions or inquiries related to the projects.
+For an Arduino project (05 to 10), open the project's README. Either the `.pdsprj` already points at the HEX, or the README tells you which HEX to put in the Arduino's **Program File** property. The `_sim_x5` / `_sim_x10` HEX files run the long timers faster, so a demo doesn't take 20 minutes.
 
-## Business inquiry
-If you have any of business quiry  feel free to share 
+To flash a real board:
 
-#### Thank you for using Proteus Projects! Happy tinkering and simulating!
+```bash
+avrdude -p m328p -c arduino -P /dev/ttyUSB0 -b 115200 -U flash:w:projects/08-water-tank-level-controller/firmware/build/water_level_controller.hex:i
+```
+
+You can also open the `.ino` in the Arduino IDE and upload it as usual.
+
+## Building and testing without the Arduino IDE
+
+On Linux or WSL:
+
+```bash
+sudo apt-get install gcc-avr avr-libc binutils-avr simavr libsimavr-dev libelf-dev
+tools/build_all.sh     # rebuild every HEX
+tools/test_all.sh      # run every simulator test
+```
+
+The tests load the real compiled firmware into simavr (an AVR simulator), drive the inputs on a timeline (switches, sensor voltages, a PIR), and check the outputs every millisecond. For the traffic controller that includes checking that two crossing greens never light together. GitHub Actions runs the same two scripts on every push. The badge at the top shows the result.
+
+The Arduino core (1.8.6) and every library are pinned to exact versions in `tools/build_firmware.sh`, so a rebuild next year produces the same firmware.
+
+## About the 2023 files
+
+In October 2026 I cleaned this repo up. I gave every project its own numbered folder with clear file names, and removed the Proteus autosaves, backups, per-PC workspace files and autorouter scratch files. A `.gitignore` now keeps them out. Nothing is really lost: the repo exactly as it was is tagged as [`archive-2023-original`](https://github.com/sprasapradip/proteus-project/tree/archive-2023-original).
+
+## Author
+
+Pradip Subedi ([@sprasapradip](https://github.com/sprasapradip)), electrical engineer, Nepal.
+
+For project work or questions, open an issue on this repo.

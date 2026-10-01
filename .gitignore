@@ -1,0 +1,30 @@
+# Proteus per-user / per-machine files
+*.workspace
+*.pdsbak
+Project Backups/
+*\[Autosaved\]*
+Last Loaded*
+Backup Of*
+
+# Proteus / ARES autorouter scratch files
+bestsave.rte
+*.DO
+*.do
+*.EDF
+*.edf
+*.sts
+*.log
+
+# Build output (HEX files we ship are committed on purpose; ELF/objects are not)
+*.elf
+*.o
+*.a
+.cache/
+build-tmp/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+__pycache__/
