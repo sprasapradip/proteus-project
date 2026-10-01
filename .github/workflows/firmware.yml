@@ -29,6 +29,9 @@ jobs:
       - name: Run simulator tests
         run: tools/test_all.sh
 
+      - name: Traffic report script (demo data)
+        run: python3 projects/15-vehicle-speed-detector/tools/traffic_report.py /tmp/demo.log --demo
+
       - name: Upload HEX files
         uses: actions/upload-artifact@v4
         with:

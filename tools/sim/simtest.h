@@ -158,6 +158,16 @@ static void expect(int cond, const char *fmt, ...) {
   if (!cond) sim_failures++;
 }
 
+/* Types a line into the board's serial port, one byte per ~2 ms (9600 baud
+ * is about 1 ms per byte, so the receive buffer never overflows). */
+__attribute__((unused)) static void uart_send(const char *text) {
+  avr_irq_t *rx = avr_io_getirq(sim, AVR_IOCTL_UART_GETIRQ('0'), UART_IRQ_INPUT);
+  for (const char *c = text; *c; c++) {
+    avr_raise_irq(rx, (uint8_t)*c);
+    sim_run_ms(2);
+  }
+}
+
 static int sim_finish(void) {
   printf("\nResult: %s (%d problem%s)\n", sim_failures ? "FAIL" : "PASS",
          sim_failures, sim_failures == 1 ? "" : "s");

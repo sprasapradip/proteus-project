@@ -30,7 +30,6 @@
 #define REG_PIND 0x29
 
 enum { N, E, S, W };
-static const char *ARM = "NESW";
 
 static avr_t *avr;
 static int failures;

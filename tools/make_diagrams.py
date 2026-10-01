@@ -155,12 +155,14 @@ def all_wiring():
            "Approach sensors go far enough out that the barrier is down well before the train arrives.")
 
     wiring("15-vehicle-speed-detector", "wiring.png",
-           "Vehicle speed detector wiring",
+           "Vehicle speed detector v2 wiring",
            [("D2", "IR beam A receiver (LOW = broken)", BLU), ("D3", "IR beam B receiver", BLU),
-            ("D7", "RESET counters button", GRY)],
-           [("D8", "green OK lamp", GRN), ("D9", "buzzer", YEL), ("D10", "SLOW DOWN sign driver", RED),
-            ("D13", "status LED", GRN), ("D12 D11", "LCD RS, EN", PUR), ("A0..A3", "LCD D4..D7", PUR)],
-           "Beams exactly 1.00 m apart (set BEAM_GAP_M), at bumper height, across the lane.")
+            ("D7", "RESET statistics button", GRY), ("A4", "MAX7219 DIN (big display)", ORG),
+            ("A5", "MAX7219 CLK", ORG), ("D4", "MAX7219 LOAD", ORG)],
+           [("D8", "THANK YOU lamp (green)", GRN), ("D10", "SLOW DOWN sign driver", RED),
+            ("D5", "KEEP DISTANCE lamp", YEL), ("D9", "buzzer", YEL), ("D13", "status LED", GRN),
+            ("D12 D11", "LCD RS, EN", PUR), ("A0..A3", "LCD D4..D7", PUR)],
+           "Beams exactly 1.00 m apart at bumper height (or SET GAP mm). USB serial: CSV log + commands.")
 
 
 # ---------------------------------------------------------------------------
