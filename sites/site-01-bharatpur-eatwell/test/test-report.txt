@@ -1,0 +1,33 @@
+Site 1 (Bharatpur, Mahendra Highway / Eatwell Bakery Cafe) - simulator test
+Firmware: firmware/traffic_controller_site01/traffic_controller_site01.ino
+
+=== normal operation (5x speed build) ===
+Loaded 5694 .text at address 0x0
+Loaded 486 .data
+
+[1] normal cycle
+  every approach received green                           ok
+  no WALK without a request                               ok
+[2] pedestrian request
+  WALK shown after request                                ok
+[3] night mode
+  flashing yellow, no green                               ok
+[4] night mode off
+  returns to normal through all-red                       ok
+[5] emergency hold
+  all red for the whole hold                              ok
+[6] emergency released
+  traffic resumes after release                           ok
+
+Result: PASS (0 problems)
+
+=== forced conflict must latch FAULT ===
+Loaded 5770 .text at address 0x0
+Loaded 486 .data
+
+[F] injected conflict
+  no green after the conflict                             ok
+  all heads flashing red                                  ok
+  stays latched after inputs toggle                       ok
+
+Result: PASS (0 problems)

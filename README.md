@@ -20,7 +20,7 @@ I'm Pradip Subedi, an electrical engineering student from Nepal. Most of these p
 | 04 | [8051 7-segment display](projects/04-8051-7segment-display) | 80C51 multiplexing 8 digits | Schematic. Firmware missing |
 | 05 | [LED matrix scrolling display](projects/05-led-matrix-scrolling-display) | Arduino + MAX7219 chain, MD_Parola, serial message input | Runs in Proteus |
 | 06 | [Gas / smoke detector with SMS](projects/06-gas-smoke-detector-gsm) | MQ-2, MQ-3, SIM900, exhaust fan, gas valve servo | Firmware v2, tested |
-| 07 | [Traffic light controller, 8 sites](projects/07-traffic-light-controller) | 4-way junction, conflict monitor, pedestrian, night, emergency, field install guide | Firmware v2, tested |
+| 07 | [Traffic light controller, 8 sites](projects/07-traffic-light-controller) | 4-way junction, conflict monitor, pedestrian, night, emergency, field install guide. Per-junction folders in [sites/](sites) | Firmware v2, tested |
 | 08 | [Water tank level controller](projects/08-water-tank-level-controller) | 4-level probes, sump dry-run, no-rise and max-run protection, LCD | New, tested |
 | 09 | [Smart street light](projects/09-smart-street-light) | LDR + PIR, dusk/dawn filtering, motion boost, late-night dimming | New, tested |
 | 10 | [DC power & energy meter](projects/10-dc-power-energy-meter) | V, A, W, Wh, CSV log, OV/OC/short/low-battery cut-off | New, tested |
@@ -50,6 +50,9 @@ proteus-project/
 │       │   └── build/         ready HEX files for Proteus or a real board
 │       ├── images/            wiring diagrams and schematics (PNG)
 │       └── test/sim_test.c    simulator test
+├── sites/
+│   └── site-NN-city-landmark/ one real junction: layout, site firmware + HEX, Proteus,
+│                              timing plan, bill of materials, commissioning checklist
 ├── tools/
 │   ├── build_firmware.sh      sketch -> HEX, pinned Arduino core and libraries
 │   ├── build_all.sh           rebuilds every HEX in the repo
