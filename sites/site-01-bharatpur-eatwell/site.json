@@ -16,15 +16,53 @@
   "junction_type": "cross (4 arms)",
   "traffic_side": "left",
   "arms": [
-    { "firmware": "N", "pins": "D2 D3 D4", "road": "Mahendra Highway, north arm", "pole": "P1", "corner": "NE", "landmark": "Namaste Mero Mobile" },
-    { "firmware": "E", "pins": "D5 D6 D7", "road": "Side road, east arm (towards Hotel Gangotri)", "pole": "P2", "corner": "SE", "landmark": "International Courier and Super Kinetic Courier" },
-    { "firmware": "S", "pins": "D8 D9 D10", "road": "Mahendra Highway, south arm", "pole": "P3", "corner": "SW", "landmark": "Eatwell Bakery Cafe" },
-    { "firmware": "W", "pins": "D11 D12 D13", "road": "Side road, west arm", "pole": "P4", "corner": "NW", "landmark": "Infotech Computer" }
+    {
+      "firmware": "N",
+      "pins": "D2 D3 D4",
+      "road": "Mahendra Highway, north arm",
+      "pole": "P1",
+      "corner": "NE",
+      "landmark": "Namaste Mero Mobile"
+    },
+    {
+      "firmware": "E",
+      "pins": "D5 D6 D7",
+      "road": "Side road, east arm (towards Hotel Gangotri)",
+      "pole": "P2",
+      "corner": "SE",
+      "landmark": "International Courier and Super Kinetic Courier"
+    },
+    {
+      "firmware": "S",
+      "pins": "D8 D9 D10",
+      "road": "Mahendra Highway, south arm",
+      "pole": "P3",
+      "corner": "SW",
+      "landmark": "Eatwell Bakery Cafe"
+    },
+    {
+      "firmware": "W",
+      "pins": "D11 D12 D13",
+      "road": "Side road, west arm",
+      "pole": "P4",
+      "corner": "NW",
+      "landmark": "Infotech Computer"
+    }
   ],
   "timing_s": {
     "plan": "split",
-    "order": ["N", "E", "S", "W"],
-    "green": { "N": 35, "E": 20, "S": 35, "W": 20 },
+    "order": [
+      "N",
+      "E",
+      "S",
+      "W"
+    ],
+    "green": {
+      "N": 35,
+      "E": 20,
+      "S": 35,
+      "W": 20
+    },
     "yellow": 4,
     "all_red": 3,
     "pedestrian_walk": 10,
@@ -34,10 +72,32 @@
     "night_mode": "flashing yellow, 24 h timer suggested 23:00-05:00",
     "approval": "pending: traffic police / road authority"
   },
-  "design_estimates": { "junction_width_m": 20, "highway_crossing_m": 15, "approach_speed_kmh": 50 },
+  "design_estimates": {
+    "junction_width_m": 20,
+    "highway_crossing_m": 15,
+    "approach_speed_kmh": 50
+  },
   "firmware": {
     "source": "firmware/traffic_controller_site01/traffic_controller_site01.ino",
     "hex_real_time": "firmware/build/traffic_controller_site01.hex",
-    "hex_proteus_5x": "firmware/build/traffic_controller_site01_sim_x5.hex"
+    "hex_proteus_5x": "firmware/build/traffic_controller_site01_sim_x5.hex",
+    "version": "2.1.0-site01",
+    "countdown_source": "firmware/countdown_display/countdown_display.ino",
+    "countdown_hex": "firmware/build/countdown_display.hex"
+  },
+  "countdown": {
+    "link_pin": "A5",
+    "baud": 9600,
+    "frame_example": "$CD,G,G035,R042,R069,R111*77",
+    "display": "4 digits per arm: letter (G/Y/r) + 3 digits; ---- when no time; blank after 3 s without data",
+    "unit": "second Arduino Uno + 2 x MAX7219 (U1: N,E  U2: S,W)",
+    "pins": {
+      "D0": "link in (RX)",
+      "D11": "DIN",
+      "D13": "CLK",
+      "D10": "LOAD U1",
+      "D9": "LOAD U2",
+      "D7": "link LED"
+    }
   }
 }

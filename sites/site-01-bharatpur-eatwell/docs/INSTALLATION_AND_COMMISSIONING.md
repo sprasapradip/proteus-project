@@ -43,6 +43,8 @@ Print this page and tick each line on site. Do it with the traffic police presen
   - [ ] `4 phases, plan=SPLIT`
   - [ ] the four arm lines (N Mahendra Hwy north P1 ... W side road west P4)
 - [ ] Arduino labelled "SITE 1 BRT-EATWELL"; the spare board is flashed and labelled too
+- [ ] Countdown unit flashed with `firmware/build/countdown_display.hex`, labelled "SITE 1 COUNTDOWN"
+- [ ] Boot log also shows `countdown link on A5, 9600 baud`
 
 ## 5. Switch-on tests (heads covered or turned away until test 9)
 
@@ -58,6 +60,10 @@ Print this page and tick each line on site. Do it with the traffic police presen
 | 8 | Emergency key off | All red 5 s, then the normal cycle | [ ] |
 | 9 | Uncover the heads, watch 3 cycles in real traffic | No conflicts, queues clear; note any arm that needs more green | [ ] |
 | 10 | Status check | Type `s` in the serial terminal: state, phase and cycle count look right | [ ] |
+| 11 | Countdown at power-on | All countdown segments light for 1 s, then each arm shows `r` and a number during start-up | [ ] |
+| 12 | Countdown during a cycle | P1 shows `G 35` counting down to 1, then `Y 4`; the arm due next reaches 1 just as its green comes on | [ ] |
+| 13 | Countdown in night / emergency | All four displays show `----` | [ ] |
+| 14 | Countdown link cut | Unplug the link: displays go blank within 3 s, lamps keep running normally | [ ] |
 
 ## 6. Notes from switch-on
 

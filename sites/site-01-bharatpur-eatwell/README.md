@@ -1,6 +1,6 @@
 # Site 1: Mahendra Highway junction at Eatwell Bakery Cafe, Bharatpur
 
-Everything for traffic signal Site 1 is in this folder: the site layout, the firmware built for this junction, ready HEX files, the Proteus project, the timing plan, the bill of materials, and the installation and commissioning checklist.
+Everything for traffic signal Site 1 is in this folder: the site layout, the firmware built for this junction, the countdown display unit, ready HEX files, the Proteus project, the timing plan, the bill of materials, and the installation and commissioning checklist.
 
 | | |
 |---|---|
@@ -8,7 +8,8 @@ Everything for traffic signal Site 1 is in this folder: the site layout, the fir
 | Landmark | Eatwell Bakery Cafe (south-west corner) |
 | Coordinates | approx. 27.696473 N, 84.421030 E ([open in Apple Maps](https://maps.apple.com/place?address=Mahendra%20Highway,%20Bharatpur,%20Nepal&coordinate=27.696473,84.421030&name=Eatwell%20Bakery%20Cafe&place-id=IA238CD8C789DE3E4&map=h)) |
 | Junction type | "+" cross road, 4 arms, 4 signal poles |
-| Controller | Arduino Uno with this folder's firmware, `BRT-EATWELL` |
+| Controller | Arduino Uno with this folder's firmware, `BRT-EATWELL` (v2.1.0) |
+| Countdown | Second Arduino Uno + 2 × MAX7219, a 4-digit countdown for every arm |
 | Status | Design ready, tested in the simulator and in Proteus. Timings to be approved before switch-on. |
 
 ![Site 1 layout](images/site01-layout.png)
@@ -50,15 +51,19 @@ The junction width (about 20 m) and crossing length (about 15 m) are my estimate
 | `firmware/traffic_controller_site01/traffic_controller_site01.ino` | Site 1 firmware: the tested controller with this junction's profile and arm names built in |
 | `firmware/build/traffic_controller_site01.hex` | Real-time HEX for the board installed at the junction |
 | `firmware/build/traffic_controller_site01_sim_x5.hex` | 5x faster HEX for Proteus demos (one cycle in about 28 s) |
+| `firmware/countdown_display/countdown_display.ino` | Countdown display unit firmware (second Arduino) |
+| `firmware/build/countdown_display.hex` | HEX for the countdown unit (the same file works with both controller HEX files) |
 | `proteus/site01-bharatpur-eatwell.pdsprj` | Proteus project with the Site 1 sketch inside |
 | `images/site01-layout.png` | Labelled junction layout with the poles, shops, lanes and cabinet |
 | `images/site01-timing.png` | Timing plan |
 | `images/site01-wiring.png` | Controller wiring (same pin map as the main project) |
 | `images/site01-field-hardware.png` | Cabinet, power and lamp driver block diagram |
+| `images/site01-countdown-wiring.png` | Countdown unit wiring and the link format |
 | `photos/site01-hand-sketch.jpg` | My site sketch (location data removed from the photo) |
 | `docs/BILL_OF_MATERIALS.md` | Everything to buy for this junction |
 | `docs/INSTALLATION_AND_COMMISSIONING.md` | Installation steps and the switch-on checklist, with sign-off |
 | `site.json` | Site data in one file (location, arms, poles, timings) |
+| `test/countdown_test.c` | Countdown test: runs the controller and the countdown unit together in the simulator |
 | `test/test-report.txt` | Latest simulator test result for this firmware |
 | `tools/build.sh`, `tools/test.sh`, `tools/make_images.py` | Rebuild the HEX, rerun the test, redraw the images |
 
@@ -69,19 +74,69 @@ The junction width (about 20 m) and crossing length (about 15 m) are my estimate
 3. Run it. In the virtual terminal (9600 baud) the board introduces itself with this site's arms:
 
 ```
-[S01 BRT-EATWELL t=0s] Traffic controller v2.0.0 boot, reset=POWER-ON
+[S01 BRT-EATWELL t=0s] Traffic controller v2.1.0 boot, reset=POWER-ON
 [S01 BRT-EATWELL t=0s] 4 phases, plan=SPLIT
 [S01 BRT-EATWELL t=0s] N  Mahendra Hwy north  (P1, NE corner, Namaste Mero Mobile)
 [S01 BRT-EATWELL t=0s] E  side road east      (P2, SE corner, International Courier)
 [S01 BRT-EATWELL t=0s] S  Mahendra Hwy south  (P3, SW corner, Eatwell Bakery Cafe)
-[S01 BRT-EATWELL t=0s] W  side road west      (P4, NW corner, Infotech Computer)
-[S01 BRT-EATWELL t=0s] STARTUP_RED for 5s
-[S01 BRT-EATWELL t=1s] GREEN N for 35s
+[S01 BRT-EATWELL t=1s] W  side road west      (P4, NW corner, Infotech Computer)
+[S01 BRT-EATWELL t=2s] SIMULATION BUILD: runs 5x faster, times shown are controller seconds
+[S01 BRT-EATWELL t=2s] countdown link on A5, 9600 baud
+[S01 BRT-EATWELL t=3s] STARTUP_RED for 5s
+[S01 BRT-EATWELL t=8s] GREEN N for 35s
+[S01 BRT-EATWELL t=43s] YELLOW N for 4s
+[S01 BRT-EATWELL t=47s] ALL_RED for 3s
+[S01 BRT-EATWELL t=50s] GREEN E for 20s
 ```
 
 The order on the LEDs is North (highway) green, then East, South (highway) and West, with yellow and all-red between each. Type `s` for a status report.
 
+The `t=` times are controller seconds, so they line up with the timing plan: GREEN N at t=8 and YELLOW N at t=43 is the 35 s green. In the `_sim_x5` build that 35 s passes in 7 real seconds. (Version 2.0.0 printed real seconds here, so a "35 s" green seemed to last 7 s. That's fixed.) The boot lines take a moment to print at 9600 baud, which is why start-up shows t=3 and not t=0.
+
 The wiring is the same pin map as the main traffic project (D2 to D13 for the four heads, A0 night, A1 emergency, A2 pedestrian button, A3/A4 pedestrian lamps). See `images/site01-wiring.png`.
+
+## Countdown display
+
+![Countdown wiring](images/site01-countdown-wiring.png)
+
+Each arm gets a 4-digit countdown:
+
+| Display | Meaning |
+|---|---|
+| `G 35` | green, 35 s left |
+| `Y  4` | yellow, 4 s left |
+| `r 42` | red, this arm's green starts in 42 s |
+| `r111` | red, green in 111 s (side road waiting for both highway greens) |
+| `----` | night flash, emergency hold or fault: no time to count |
+| blank | no data for 3 s (cable cut or controller off). Blank is safer than a frozen number. |
+
+A red arm's number counts down to the start of its own green, including all the yellows and all-reds before it, and the pedestrian phase once someone has pressed the button. When the button is pressed, the waiting arms jump up by 28 s (10 + 15 + 3). Night or emergency switched on during a countdown cuts it short, and the display shows dashes.
+
+**How it works.** All of D2 to D13 and A0 to A4 are used by the lamps and inputs, so the controller sends the countdown on the spare pin A5. It's one wire at 9600 baud, sent once a second and whenever a number changes. A second Arduino (the countdown unit) reads it and drives two MAX7219 chips. Each chip drives two 4-digit displays. The controller's lamp logic doesn't depend on the countdown at all. Unplug the unit and the junction runs exactly the same.
+
+Example frame (attach a Proteus VIRTUAL TERMINAL to A5 at 9600 baud to watch them):
+
+```
+$CD,G,G035,R042,R069,R111*77
+```
+
+`G` is the controller state, then the N, E, S and W fields, then an XOR checksum. The countdown unit ignores any frame with a bad checksum.
+
+### Adding it in Proteus
+
+The schematic in `proteus/` dates from 2023. Its single 7-segment digit and its COUNTER TIMER instrument were never wired to any firmware, so they can't show the countdown. Delete them and add the countdown unit (about 20 minutes with terminal labels):
+
+1. Place a second **ARDUINO UNO** (call it ARD2). Set its **Program File** to `firmware/build/countdown_display.hex`, Clock 16 MHz.
+2. Wire the controller's **A5** to ARD2 **D0 (RX)**. Both boards share GND.
+3. Place two **MAX7219** (U1, U2) and four **7SEG-MPX4-CC** displays (N, E, S, W). Use green or red parts as you like.
+4. ARD2 **D11** to DIN of U1 and U2, **D13** to CLK of both, **D10** to LOAD of U1, **D9** to LOAD of U2. Give each MAX7219 VCC, GND, and ISET through 10k to +5 V.
+5. U1 **SEG A to G and DP** go to the A to G and DP pins of both the N and E displays. U1 **DIG0 to DIG3** go to pins 1 to 4 of the N display, and **DIG4 to DIG7** to pins 1 to 4 of the E display. Do the same for U2 with the S and W displays.
+6. Optional: an LED with 330 Ω on ARD2 **D7** (link OK), and a VIRTUAL TERMINAL on A5.
+7. Run. The displays do a 1 s all-segments test, then show `r  5 r 47 r 74 r116` during start-up all-red, then `G 35 r 42 r 69 r111` when North goes green.
+
+The Proteus COUNTER TIMER instrument counts simulation time, and Proteus often runs slower than real time on a busy PC. Don't compare the lights with your watch or with that instrument. Use the countdown display or the `t=` in the log, which both count controller seconds.
+
+On site, the countdown unit can sit in the cabinet with the displays on the poles, or each pole can have its own small unit. Either way, use an RS485 driver (MAX485) on both ends of the link for any cable longer than a few metres.
 
 ## Flashing the real controller
 
@@ -90,11 +145,21 @@ avrdude -p m328p -c arduino -P /dev/ttyUSB0 -b 115200 \
   -U flash:w:firmware/build/traffic_controller_site01.hex:i
 ```
 
-Or open the `.ino` in the Arduino IDE and upload it. Use the real-time HEX on site, never the `_sim_x5` one.
+Or open the `.ino` in the Arduino IDE and upload it. Use the real-time HEX on site, never the `_sim_x5` one. The countdown unit gets `countdown_display.hex` the same way.
 
 ## Tested
 
-`tools/test.sh` runs the traffic controller safety test against this exact firmware. It checks every approach getting green, the pedestrian phase, night flash, the emergency hold and recovery, and that two conflicting greens never appear in any simulated millisecond. A second build forces a conflict to prove the FAULT latch. The latest result is in [test/test-report.txt](test/test-report.txt): **all checks pass**. You also ran the `_sim_x5` HEX in Proteus and it works.
+`tools/test.sh` runs the traffic controller safety test against this exact firmware. It checks every approach getting green, the pedestrian phase, night flash, the emergency hold and recovery, and that two conflicting greens never appear in any simulated millisecond. A second build forces a conflict to prove the FAULT latch.
+
+Then `test/countdown_test.c` runs the controller and the countdown unit together, wired A5 to RX, through two normal cycles, a pedestrian request, night and emergency. It checks:
+- Every frame arrives with a good checksum, at least once a second.
+- The letter for every arm matches the lamp that's actually lit.
+- Every red number matches the real time until that arm's green, and every green number the real time until its yellow, to within the 1 s rounding.
+- The log shows a 35 s green as 35 s.
+- The displays always show the latest frame, and dashes in night, emergency and fault.
+- A corrupt frame is ignored, and the displays blank 3 s after the link goes quiet.
+
+The latest result is in [test/test-report.txt](test/test-report.txt): **all checks pass**.
 
 ## Before switch-on
 

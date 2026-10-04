@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Draws the Site 1 layout and timing plan into ../images/.
+"""Draws the Site 1 layout, timing plan and countdown wiring into ../images/.
 
     python3 sites/site-01-bharatpur-eatwell/tools/make_images.py
 
@@ -187,6 +187,96 @@ def timing():
     print("wrote", OUT / "site01-timing.png")
 
 
+def seg7(ax, x, y, text, color, h=1.0):
+    """Draws a 4-character 7-segment readout (digits, space, G, Y, r, -)."""
+    SEGS = {"0": "abcdef", "1": "bc", "2": "abged", "3": "abgcd", "4": "fgbc", "5": "afgcd",
+            "6": "afgedc", "7": "abc", "8": "abcdefg", "9": "abcfgd", " ": "", "-": "g",
+            "G": "acdef", "Y": "bcdfg", "r": "eg"}
+    w = 0.55 * h
+    ax.add_patch(FancyBboxPatch((x - 0.15, y - 0.2), len(text) * (w + 0.25) + 0.1, h + 0.4,
+                                boxstyle="round,pad=0.05", fc="#101214", ec="#000", zorder=3))
+    for i, ch in enumerate(text):
+        x0 = x + i * (w + 0.25)
+        lines = {"a": ((x0, y + h), (x0 + w, y + h)), "b": ((x0 + w, y + h), (x0 + w, y + h / 2)),
+                 "c": ((x0 + w, y + h / 2), (x0 + w, y)), "d": ((x0, y), (x0 + w, y)),
+                 "e": ((x0, y), (x0, y + h / 2)), "f": ((x0, y + h / 2), (x0, y + h)),
+                 "g": ((x0, y + h / 2), (x0 + w, y + h / 2))}
+        for k, (p0, p1) in lines.items():
+            on = k in SEGS[ch]
+            ax.plot([p0[0], p1[0]], [p0[1], p1[1]], color=color if on else "#262a2e",
+                    lw=3.2, solid_capstyle="round", zorder=4)
+
+
+def countdown_wiring():
+    fig, ax = plt.subplots(figsize=(13, 7.6))
+    ax.set_xlim(0, 26)
+    ax.set_ylim(0, 15.2)
+    ax.axis("off")
+
+    def box(x, y, w, h, title, lines, fc="#eef3fb", ec=BLU):
+        ax.add_patch(FancyBboxPatch((x, y), w, h, boxstyle="round,pad=0.1,rounding_size=0.25",
+                                    fc=fc, ec=ec, lw=1.4, zorder=1))
+        ax.text(x + w / 2, y + h - 0.45, title, ha="center", va="center", fontsize=11, fontweight="bold", color=INK)
+        for i, t in enumerate(lines):
+            ax.text(x + 0.3, y + h - 1.15 - i * 0.55, t, ha="left", va="center", fontsize=9, color=INK,
+                    family="monospace")
+
+    def wire(p, q, text="", color=INK, dy=0.18):
+        ax.annotate("", xy=q, xytext=p, arrowprops=dict(arrowstyle="-|>", color=color, lw=1.6), zorder=2)
+        if text:
+            ax.text((p[0] + q[0]) / 2, (p[1] + q[1]) / 2 + dy, text, ha="center", va="bottom", fontsize=8.8,
+                    color=color)
+
+    box(0.4, 7.2, 5.6, 6.6, "Traffic controller", ["Arduino Uno #1", "traffic_controller_",
+        "  site01(_sim_x5).hex", "", "D2-D13  lamps", "A0-A4   inputs, ped", "A5      countdown out",
+        "GND"], fc="#fdf1f1", ec=RED)
+    box(8.3, 7.2, 5.6, 6.6, "Countdown unit", ["Arduino Uno #2", "countdown_display.hex", "",
+        "D0 RX   link in", "D11     DIN  (U1+U2)", "D13     CLK  (U1+U2)", "D10     LOAD U1",
+        "D9      LOAD U2", "D7      link LED"], fc="#eefaf0", ec=GRN)
+    wire((6.0, 9.4), (8.3, 9.4), "")
+    ax.text(7.15, 10.0, "A5 -> D0 (RX)\n9600 baud", ha="center", va="bottom", fontsize=8.8, color=INK)
+    wire((6.0, 8.2), (8.3, 8.2), "GND - GND", color=MUTED)
+    box(0.4, 0.5, 13.5, 5.6, "", [], fc="#fafafa", ec="#c9ccd1")
+    ax.text(7.15, 5.6, "Optional: VIRTUAL TERMINAL on A5 shows the raw frames", ha="center", fontsize=9.5,
+            color=MUTED)
+    ax.text(0.8, 4.6, "$CD,G,G035,R042,R069,R111*77", fontsize=10.5, family="monospace", color=INK)
+    rows = [("state", "U start, G, Y, A all-red, W/P/C walk, N night, E emerg., F fault"),
+            ("G035", "green, 35 s left"), ("R042", "red, own green starts in 42 s"),
+            ("R---  F---  X---", "no time: emergency / night flash / fault"), ("*77", "XOR checksum")]
+    for i, (k, v) in enumerate(rows):
+        ax.text(0.8, 3.7 - i * 0.62, k, fontsize=9, family="monospace", color=BLU)
+        ax.text(4.6, 3.7 - i * 0.62, v, fontsize=9, color=INK)
+
+    # MAX7219 chips and displays
+    for j, (chip, arms) in enumerate([("U1 MAX7219", (("N  Mahendra Hwy north, P1", "G 35", GRN),
+                                                      ("E  side road east, P2", "r 42", RED))),
+                                      ("U2 MAX7219", (("S  Mahendra Hwy south, P3", "r 69", RED),
+                                                      ("W  side road west, P4", "r111", RED)))]):
+        y0 = 8.2 - j * 6.6
+        ax.add_patch(FancyBboxPatch((15.3, y0), 2.6, 5.4, boxstyle="round,pad=0.08", fc="#20242a", ec="#000",
+                                    zorder=1))
+        ax.text(16.6, y0 + 4.9, chip, ha="center", color="white", fontsize=9.5, fontweight="bold")
+        for k, t in enumerate(["DIN", "CLK", "LOAD", "ISET-10k-5V"]):
+            ax.text(15.45, y0 + 4.1 - k * 0.5, t, color="#cfd3d8", fontsize=8, family="monospace")
+        ax.text(15.45, y0 + 1.6, "SEG A-G, DP\nto both displays", color="#cfd3d8", fontsize=7.6, va="top")
+        for k, (name, txt, col) in enumerate(arms):
+            yy = y0 + 3.2 - k * 2.9
+            seg7(ax, 19.6, yy, txt, col, h=1.3)
+            ax.text(19.45, yy + 1.85, name, fontsize=9, color=INK)
+            ax.text(25.9, yy + 0.55, f"DIG{k * 4}-{k * 4 + 3}", fontsize=8, color=MUTED, ha="right")
+            wire((17.9, yy + 0.65), (19.35, yy + 0.65), color=MUTED)
+        wire((13.9, 11.0 - j * 1.4), (15.3, y0 + 3.6), color=GRN)
+        ax.text(14.45, (11.0 - j * 1.4 + y0 + 3.6) / 2 + (0.5 if j == 0 else -0.3),
+                "D11, D13,\n" + ("D10" if j == 0 else "D9"), ha="center", fontsize=8.2, color=GRN)
+
+    ax.set_title("Site 1 countdown display: wiring and link format (4-digit common-cathode displays, "
+                 "7SEG-MPX4-CC in Proteus)", fontsize=12, color=INK)
+    fig.savefig(OUT / "site01-countdown-wiring.png", dpi=150, bbox_inches="tight", facecolor="white")
+    plt.close(fig)
+    print("wrote", OUT / "site01-countdown-wiring.png")
+
+
 if __name__ == "__main__":
     layout()
     timing()
+    countdown_wiring()

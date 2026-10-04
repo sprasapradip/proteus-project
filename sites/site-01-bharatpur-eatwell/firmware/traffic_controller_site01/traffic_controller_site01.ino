@@ -7,7 +7,7 @@
  *              Proprietary - no use, copying or modification without written
  *              permission. See LICENSE in the repository root.
  *  Board     : Arduino Uno / ATmega328P @ 16 MHz
- *  Version   : 2.0.0-site01
+ *  Version   : 2.1.0-site01
  *
  *  Location  : Mahendra Highway, Bharatpur, Chitwan, Nepal
  *              approx. 27.696473 N, 84.421030 E (Eatwell Bakery Cafe corner)
@@ -39,6 +39,9 @@
  *      (all heads flash red) until a technician power-cycles the box
  *    - Hardware watchdog (2 s) and reset-cause logging
  *    - Read-only serial status port (9600 baud, send 's' or 'h')
+ *    - Countdown link on A5: one wire, 9600 baud, sends the seconds left
+ *      for every arm to the countdown display unit (firmware/
+ *      countdown_display). Never affects the lamps.
  *    - T-junction support through the approach mask
  *
  *  Pin map (same as the main project; see the site README)
@@ -51,7 +54,7 @@
  *    A2  Pedestrian button     (to GND = request)
  *    A3  Pedestrian WALK lamp
  *    A4  Pedestrian DON'T WALK lamp
- *    A5  Spare
+ *    A5  Countdown link out    (to RX of the countdown display unit)
  *    D0/D1 Serial (USB) for logging
  * ============================================================================
  */
@@ -121,6 +124,11 @@ const uint8_t PIN_EMERGENCY  = A1;
 const uint8_t PIN_PED_BUTTON = A2;
 const uint8_t PIN_PED_WALK   = A3;
 const uint8_t PIN_PED_STOP   = A4;
+// Countdown link (A5 = PC5). Written straight to the port by a Timer2
+// interrupt, so it never blocks the state machine.
+#define CD_PORT PORTC
+#define CD_DDR  DDRC
+#define CD_BIT  5
 
 const char APPROACH_CHAR[NUM_APPROACHES] = { 'N', 'E', 'S', 'W' };
 
@@ -255,6 +263,18 @@ static unsigned long secToMs(uint16_t sec) {
   return (unsigned long)sec * 1000UL * TIME_SCALE_PERCENT / 100UL;
 }
 
+// Elapsed time in controller seconds. In a TIME_SCALE_PERCENT=20 build the
+// controller runs 5x faster, and the log still shows the same seconds as the
+// timing plan (a 35 s green reads as 35 s, not 7 s).
+static unsigned long ctrlSeconds() {
+  return millis() / (TIME_SCALE_PERCENT * 10UL);
+}
+
+// Real milliseconds -> controller milliseconds.
+static unsigned long realToCtrlMs(unsigned long ms) {
+  return ms / TIME_SCALE_PERCENT * 100UL + (ms % TIME_SCALE_PERCENT) * 100UL / TIME_SCALE_PERCENT;
+}
+
 static uint8_t clampU8(uint8_t v, uint8_t lo, uint8_t hi) {
   return v < lo ? lo : (v > hi ? hi : v);
 }
@@ -288,7 +308,7 @@ static void logPrefix() {
   Serial.print(' ');
   Serial.print(site.name);
   Serial.print(F(" t="));
-  Serial.print(millis() / 1000UL);
+  Serial.print(ctrlSeconds());
   Serial.print(F("s] "));
 }
 
@@ -378,13 +398,20 @@ static void applyOutputs() {
     return;
   }
 
-  for (uint8_t a = 0; a < NUM_APPROACHES; a++) {
-    writePin(LAMP_PIN[a][0], lampCmd[a] & LAMP_RED);
-    writePin(LAMP_PIN[a][1], lampCmd[a] & LAMP_YELLOW);
-    writePin(LAMP_PIN[a][2], lampCmd[a] & LAMP_GREEN);
+  // Two passes: every lamp that goes off first, then every lamp that comes
+  // on. A head changing colour is never lit in two colours, not even for the
+  // few microseconds between two pin writes.
+  const uint8_t LAMP_BIT[3] = { LAMP_RED, LAMP_YELLOW, LAMP_GREEN };
+  for (uint8_t pass = 0; pass < 2; pass++) {
+    bool on = pass == 1;
+    for (uint8_t a = 0; a < NUM_APPROACHES; a++) {
+      for (uint8_t l = 0; l < 3; l++) {
+        if ((bool)(lampCmd[a] & LAMP_BIT[l]) == on) writePin(LAMP_PIN[a][l], on);
+      }
+    }
+    if (pedWalkCmd == on) writePin(PIN_PED_WALK, on);
+    if (pedStopCmd == on) writePin(PIN_PED_STOP, on);
   }
-  writePin(PIN_PED_WALK, pedWalkCmd);
-  writePin(PIN_PED_STOP, pedStopCmd);
 
   if (state == ST_FAULT) return;
 
@@ -432,6 +459,12 @@ static bool stateExpired() {
 
 static unsigned long stateElapsedMs() {
   return millis() - stateStartMs;
+}
+
+// Time left in the current state, in controller milliseconds.
+static unsigned long stateRemainingCtrlMs() {
+  unsigned long el = stateElapsedMs();
+  return el >= stateDurationMs ? 0 : realToCtrlMs(stateDurationMs - el);
 }
 
 static void enterFault(const char *reason) {
@@ -586,6 +619,189 @@ static void computeLamps() {
 }
 
 // ============================================================================
+//  COUNTDOWN LINK (A5)
+//  Once a second, and whenever a number changes, the controller sends one
+//  line for the countdown display unit:
+//
+//      $CD,G,G035,R042,R069,R111*77
+//
+//  field 1  state: U startup, G green, Y yellow, A all-red, W walk,
+//           P walk flashing, C walk clear, N night, E emergency, F fault
+//  fields 2-5  arms N, E, S, W: a letter and three digits
+//           G035  green, 35 s left        Y004  yellow, 4 s left
+//           R042  red, green in 42 s      R---  red, no time (emergency)
+//           F---  night flash             X---  dark / fault / no arm
+//  *HH      XOR of the characters between '$' and '*', in hex
+//
+//  The times are controller seconds, the same as the timing plan. A waiting
+//  arm counts down to the start of its own green, including any pedestrian
+//  phase that has already been requested. Night or emergency switched on
+//  later can still stop a countdown early; the display then shows dashes.
+//  9600 baud 8N1, idle high. On site, run it through an RS485 driver
+//  (MAX485) when the display is more than a few metres from the cabinet.
+// ============================================================================
+#define CD_FRAME_LEN 31            // "$CD,s,aaaa,bbbb,cccc,dddd*HH\r\n" + NUL
+const uint16_t CD_CHECK_MS     = 50;    // how often the numbers are recomputed
+const uint16_t CD_HEARTBEAT_MS = 1000;  // resend even when nothing changed
+const char STATE_CODE[] = { 'U', 'G', 'Y', 'A', 'W', 'P', 'C', 'N', 'E', 'F' };
+
+volatile uint8_t cdTxBuf[CD_FRAME_LEN];
+volatile uint8_t cdTxLen = 0;      // bytes in the buffer, 0 = link idle
+volatile uint8_t cdTxPos = 0;
+volatile uint8_t cdTxBit = 0;      // 0 start, 1..8 data, 9 stop
+char cdLast[CD_FRAME_LEN] = "";
+unsigned long cdCheckedAt = 0;
+unsigned long cdSentAt = 0;
+
+// Timer2 in CTC mode at 9615 baud (16 MHz / 8 / 208). One bit per interrupt.
+ISR(TIMER2_COMPA_vect) {
+  uint8_t b = cdTxBuf[cdTxPos];
+  if (cdTxBit == 0) {
+    CD_PORT &= ~_BV(CD_BIT);                          // start bit
+  } else if (cdTxBit <= 8) {
+    if (b & (1 << (cdTxBit - 1))) CD_PORT |= _BV(CD_BIT);
+    else                          CD_PORT &= ~_BV(CD_BIT);
+  } else {
+    CD_PORT |= _BV(CD_BIT);                           // stop bit
+  }
+  if (++cdTxBit > 9) {
+    cdTxBit = 0;
+    if (++cdTxPos >= cdTxLen) {
+      cdTxLen = 0;
+      TIMSK2 &= ~_BV(OCIE2A);                         // done, line stays high
+    }
+  }
+}
+
+static void countdownBegin() {
+  CD_PORT |= _BV(CD_BIT);
+  CD_DDR  |= _BV(CD_BIT);
+  // Timer2 is free here: D3 and D11 are plain lamp outputs, never PWM.
+  TCCR2A = _BV(WGM21);
+  TCCR2B = _BV(CS21);
+  OCR2A  = 207;
+  TIMSK2 = 0;
+}
+
+static void countdownSend(const char *frame) {
+  if (cdTxLen) return;
+  uint8_t n = 0;
+  while (frame[n] && n < CD_FRAME_LEN) { cdTxBuf[n] = frame[n]; n++; }
+  cdTxPos = 0;
+  cdTxBit = 0;
+  TCNT2 = 0;
+  TIFR2 = _BV(OCF2A);
+  cdTxLen = n;
+  TIMSK2 |= _BV(OCIE2A);
+}
+
+static unsigned long phaseCycleMs(uint8_t idx) {
+  return ((unsigned long)phases[idx].greenSec + site.yellowSec + site.allRedSec) * 1000UL;
+}
+
+// Controller ms until approach a next turns green. False if it can't be told.
+static bool msUntilGreen(uint8_t a, unsigned long &ms) {
+  unsigned long t = stateRemainingCtrlMs();
+  uint8_t idx = phaseIndex;
+  bool ped = pedRequest && site.pedWalkSec > 0;
+  const unsigned long Y  = site.yellowSec * 1000UL;
+  const unsigned long AR = site.allRedSec * 1000UL;
+  const unsigned long PED = (site.pedWalkSec + site.pedFlashSec + site.allRedSec) * 1000UL;
+  bool checkPed = true;
+
+  switch (state) {
+    case ST_STARTUP_RED: idx = phaseCount - 1; checkPed = false; break;
+    case ST_GREEN:       t += Y + AR; break;
+    case ST_YELLOW:      t += AR; break;
+    case ST_ALL_RED:     break;
+    case ST_PED_WALK:    t += site.pedFlashSec * 1000UL + AR; checkPed = false; break;
+    case ST_PED_FLASH:   t += AR; checkPed = false; break;
+    case ST_PED_CLEAR:   checkPed = false; break;
+    default:             return false;
+  }
+
+  for (uint8_t step = 0; step <= phaseCount; step++) {
+    if (checkPed && ped) { t += PED; ped = false; }
+    checkPed = true;
+    idx = (idx + 1) % phaseCount;
+    if (phases[idx].greenMask & (1 << a)) { ms = t; return true; }
+    t += phaseCycleMs(idx);
+  }
+  return false;
+}
+
+static void armField(uint8_t a, char *f) {
+  char mode;
+  bool timed = false;
+  unsigned long ms = 0;
+
+  if (!approachPresent(a)) {
+    mode = 'X';
+  } else {
+    switch (state) {
+      case ST_NIGHT_FLASH: mode = 'F'; break;
+      case ST_FAULT:       mode = 'X'; break;
+      case ST_EMERGENCY:   mode = 'R'; break;
+      default: {
+        bool inPhase = phases[phaseIndex].greenMask & (1 << a);
+        if (state == ST_GREEN && inPhase) {
+          mode = 'G'; ms = stateRemainingCtrlMs(); timed = true;
+        } else if (state == ST_YELLOW && inPhase) {
+          mode = 'Y'; ms = stateRemainingCtrlMs(); timed = true;
+        } else {
+          mode = 'R'; timed = msUntilGreen(a, ms);
+        }
+      }
+    }
+  }
+
+  f[0] = mode;
+  if (timed) {
+    unsigned long sec = (ms + 999UL) / 1000UL;   // 35.0 s left shows 35
+    if (sec > 999) sec = 999;
+    f[1] = '0' + sec / 100;
+    f[2] = '0' + (sec / 10) % 10;
+    f[3] = '0' + sec % 10;
+  } else {
+    f[1] = f[2] = f[3] = '-';
+  }
+}
+
+static void buildCountdownFrame(char *out) {
+  char *p = out;
+  *p++ = '$'; *p++ = 'C'; *p++ = 'D'; *p++ = ',';
+  *p++ = STATE_CODE[state];
+  for (uint8_t a = 0; a < NUM_APPROACHES; a++) {
+    *p++ = ',';
+    armField(a, p);
+    p += 4;
+  }
+  uint8_t x = 0;
+  for (char *q = out + 1; q < p; q++) x ^= (uint8_t)*q;
+  const char HEX_DIGIT[] = "0123456789ABCDEF";
+  *p++ = '*';
+  *p++ = HEX_DIGIT[x >> 4];
+  *p++ = HEX_DIGIT[x & 0x0F];
+  *p++ = '\r';
+  *p++ = '\n';
+  *p = '\0';
+}
+
+static void serviceCountdown() {
+  unsigned long now = millis();
+  if (now - cdCheckedAt < CD_CHECK_MS || cdTxLen) return;
+  cdCheckedAt = now;
+
+  char frame[CD_FRAME_LEN];
+  buildCountdownFrame(frame);
+  if (strcmp(frame, cdLast) != 0 || now - cdSentAt >= CD_HEARTBEAT_MS) {
+    countdownSend(frame);
+    strcpy(cdLast, frame);
+    cdSentAt = now;
+  }
+}
+
+// ============================================================================
 //  SERIAL STATUS (read only, nothing can be changed from here)
 // ============================================================================
 static void printStatus() {
@@ -598,8 +814,7 @@ static void printStatus() {
   Serial.println();
   Serial.print(F("  remaining  : "));
   if (stateDurationMs) {
-    unsigned long el = stateElapsedMs();
-    Serial.print(el >= stateDurationMs ? 0 : (stateDurationMs - el) / 1000UL);
+    Serial.print((stateRemainingCtrlMs() + 999UL) / 1000UL);
     Serial.println('s');
   } else {
     Serial.println(F("-"));
@@ -652,6 +867,7 @@ void setup() {
   writePin(PIN_PED_STOP, true);
 
   Serial.begin(SERIAL_BAUD);
+  countdownBegin();
 
   loadSiteProfile();
   buildPhases();
@@ -661,7 +877,7 @@ void setup() {
   inPedButton.begin(PIN_PED_BUTTON, 50);
 
   logPrefix();
-  Serial.print(F("Traffic controller v2.0.0 boot, reset="));
+  Serial.print(F("Traffic controller v2.1.0 boot, reset="));
   if (resetCause & _BV(WDRF))       Serial.println(F("WATCHDOG"));
   else if (resetCause & _BV(BORF))  Serial.println(F("BROWN-OUT"));
   else if (resetCause & _BV(EXTRF)) Serial.println(F("RESET-PIN"));
@@ -674,6 +890,14 @@ void setup() {
     logPrefix();
     Serial.println(ARM_NAME[a]);
   }
+#if TIME_SCALE_PERCENT != 100
+  logPrefix();
+  Serial.print(F("SIMULATION BUILD: runs "));
+  Serial.print(100 / TIME_SCALE_PERCENT);
+  Serial.println(F("x faster, times shown are controller seconds"));
+#endif
+  logPrefix();
+  Serial.println(F("countdown link on A5, 9600 baud"));
 
   setState(ST_STARTUP_RED, STARTUP_RED_SEC);
   wdt_enable(WDTO_2S);
@@ -695,5 +919,6 @@ void loop() {
   runStateMachine();
   computeLamps();
   applyOutputs();
+  serviceCountdown();
   handleSerial();
 }

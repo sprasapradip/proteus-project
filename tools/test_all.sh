@@ -64,6 +64,11 @@ X="$P/15-vehicle-speed-detector"
 "$B" "$X/firmware/speed_detector/speed_detector.ino" "$OUT/speed.hex" >/dev/null
 run speed-detector "$X/test/sim_test.c" "$OUT/speed.elf"
 
+echo; echo "################ site-01 (controller, fault, countdown link + display)"
+if ! "$R/sites/site-01-bharatpur-eatwell/tools/test.sh" > "$OUT/site01.log" 2>&1 \
+   || ! grep -q "SITE 1: ALL TESTS PASSED" "$OUT/site01.log"; then FAILED+=("site-01"); fi
+grep -E "^\[|^  |Result|SITE 1" "$OUT/site01.log" || true
+
 echo
 if [ ${#FAILED[@]} -eq 0 ]; then
   echo "ALL SIMULATOR TESTS PASSED"

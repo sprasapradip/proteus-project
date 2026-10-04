@@ -1,6 +1,6 @@
 # Site 1 bill of materials
 
-For the Mahendra Highway junction at Eatwell Bakery Cafe, Bharatpur: one cabinet and four signal poles. Quantities are for this junction. Prices aren't included because they change, so get quotes locally.
+For the Mahendra Highway junction at Eatwell Bakery Cafe, Bharatpur: one cabinet, four signal poles and four countdown displays. Quantities are for this junction. Prices aren't included because they change, so get quotes locally.
 
 ## Controller cabinet
 
@@ -29,6 +29,16 @@ For the Mahendra Highway junction at Eatwell Bakery Cafe, Bharatpur: one cabinet
 | 16 | Repeater head, 300 mm, 3 aspects (recommended for the highway) | 2 | On the far side for the north and south highway approaches, wired in parallel with P1 and P3 |
 | 17 | Pedestrian head, 200 mm, red man / green man, 24 V DC LED | 8 | Two per corner, one facing each crossing. All in parallel on A3/A4 |
 | 18 | Pedestrian push button, IP65 | 4 | One per corner, all in parallel on A2 |
+
+## Countdown displays
+
+| # | Item | Qty | Notes |
+|---|---|---|---|
+| 18a | Arduino Uno R3 for the countdown unit, flashed with `countdown_display.hex` | 1 + 1 spare | Label "SITE 1 COUNTDOWN" |
+| 18b | MAX7219 driver (DIP-24 or a ready module) + 10 kΩ ISET resistor, 100 nF and 10 µF decoupling | 2 | U1 drives N and E, U2 drives S and W |
+| 18c | Countdown display, 4 digits (letter + 3 digits), weatherproof, high-brightness LED | 4 | One per pole, under the signal head. For field units with big digits, use a constant-current LED driver board per digit in place of bare 7-segment parts |
+| 18d | RS485 transceiver module (MAX485) | 2 or more | One at the controller's A5, one at each countdown unit. Needed for any link over a few metres |
+| 18e | Shielded twisted pair for the link | Same route as the lamp cable | |
 
 ## Cable and civil work
 

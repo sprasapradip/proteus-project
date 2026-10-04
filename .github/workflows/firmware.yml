@@ -36,4 +36,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: hex-files
-          path: projects/*/firmware/build/*.hex
+          path: |
+            projects/*/firmware/build/*.hex
+            sites/*/firmware/build/*.hex

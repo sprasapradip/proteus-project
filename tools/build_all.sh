@@ -63,4 +63,7 @@ echo "== 15 vehicle speed detector"
 X="$P/15-vehicle-speed-detector/firmware"
 "$B" "$X/speed_detector/speed_detector.ino" "$X/build/speed_detector.hex"
 
+echo "== site 1 (Bharatpur): controller + countdown display"
+"$R/sites/site-01-bharatpur-eatwell/tools/build.sh"
+
 echo "all firmware built"

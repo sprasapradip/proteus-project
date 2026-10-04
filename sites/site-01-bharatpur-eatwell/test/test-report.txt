@@ -2,8 +2,8 @@ Site 1 (Bharatpur, Mahendra Highway / Eatwell Bakery Cafe) - simulator test
 Firmware: firmware/traffic_controller_site01/traffic_controller_site01.ino
 
 === normal operation (5x speed build) ===
-Loaded 5694 .text at address 0x0
-Loaded 486 .data
+Loaded 7458 .text at address 0x0
+Loaded 516 .data
 
 [1] normal cycle
   every approach received green                           ok
@@ -22,12 +22,49 @@ Loaded 486 .data
 Result: PASS (0 problems)
 
 === forced conflict must latch FAULT ===
-Loaded 5770 .text at address 0x0
-Loaded 486 .data
+Loaded 7538 .text at address 0x0
+Loaded 516 .data
 
 [F] injected conflict
   no green after the conflict                             ok
   all heads flashing red                                  ok
   stays latched after inputs toggle                       ok
+
+Result: PASS (0 problems)
+
+=== countdown link and display unit (both boards wired together) ===
+
+[1] countdown link frames
+  601 frames, all with a good checksum                         ok
+  a frame at least once a second (longest gap 1002 ms)         ok
+  first frame during start-up all-red                          ok
+  first green: G035,R042,R069,R111*                            ok
+[2] letters match the lamps
+  2352 arm readings, 0 wrong                                   ok
+[3] numbers match real time
+  red: time to green right in 1270 of 1270                     ok
+  green: time to yellow right in 346 of 346                    ok
+  pedestrian phase sent (state W), countdown includes it       ok
+[4] night and emergency
+  night: every arm F--- (no number)                            ok
+  emergency: every arm R--- (no number)                        ok
+[5] serial log uses the plan's seconds
+  GREEN N for 35s lasts 35 s in the log                        ok
+  boot log announces the countdown link                        ok
+[6] display unit
+  shows every frame (2384 arm checks, 0 wrong)                 ok
+  MAX7219 set up (raw, 8 digits, on)                           ok
+  link LED on while frames arrive                              ok
+  corrupt frame (bad checksum) ignored                         ok
+  link quiet 3 s: display blank, LED off                       ok
+  display reports link lost                                    ok
+
+Result: PASS (0 problems)
+
+=== countdown during FAULT ===
+
+[F] forced conflict: countdown goes to dashes
+  frames say FAULT, every arm X---                             ok
+  display shows ---- on every arm                              ok
 
 Result: PASS (0 problems)

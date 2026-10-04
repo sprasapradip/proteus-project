@@ -368,13 +368,20 @@ static void applyOutputs() {
     return;
   }
 
-  for (uint8_t a = 0; a < NUM_APPROACHES; a++) {
-    writePin(LAMP_PIN[a][0], lampCmd[a] & LAMP_RED);
-    writePin(LAMP_PIN[a][1], lampCmd[a] & LAMP_YELLOW);
-    writePin(LAMP_PIN[a][2], lampCmd[a] & LAMP_GREEN);
+  // Two passes: every lamp that goes off first, then every lamp that comes
+  // on. A head changing colour is never lit in two colours, not even for the
+  // few microseconds between two pin writes.
+  const uint8_t LAMP_BIT[3] = { LAMP_RED, LAMP_YELLOW, LAMP_GREEN };
+  for (uint8_t pass = 0; pass < 2; pass++) {
+    bool on = pass == 1;
+    for (uint8_t a = 0; a < NUM_APPROACHES; a++) {
+      for (uint8_t l = 0; l < 3; l++) {
+        if ((bool)(lampCmd[a] & LAMP_BIT[l]) == on) writePin(LAMP_PIN[a][l], on);
+      }
+    }
+    if (pedWalkCmd == on) writePin(PIN_PED_WALK, on);
+    if (pedStopCmd == on) writePin(PIN_PED_STOP, on);
   }
-  writePin(PIN_PED_WALK, pedWalkCmd);
-  writePin(PIN_PED_STOP, pedStopCmd);
 
   if (state == ST_FAULT) return;
 
