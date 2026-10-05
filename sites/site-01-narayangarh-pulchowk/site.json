@@ -1,17 +1,15 @@
 {
   "site_id": 1,
-  "firmware_name": "BRT-EATWELL",
-  "title": "Mahendra Highway junction at Eatwell Bakery Cafe",
+  "firmware_name": "NGH-PULCHOWK",
+  "title": "Narayangarh Pulchowk (Narayani bridge chowk)",
   "location": {
-    "road": "Mahendra Highway",
-    "city": "Bharatpur",
+    "chowk": "Pulchowk, at the east end of the Narayani bridge",
+    "city": "Narayangarh, Bharatpur",
     "district": "Chitwan",
     "province": "Bagmati",
     "country": "Nepal",
-    "latitude": 27.696473,
-    "longitude": 84.42103,
-    "coordinate_note": "Map pin of Eatwell Bakery Cafe (SW corner), approximate",
-    "map_url": "https://maps.apple.com/place?address=Mahendra%20Highway,%20Bharatpur,%20Nepal&coordinate=27.696473,84.421030&name=Eatwell%20Bakery%20Cafe&place-id=IA238CD8C789DE3E4&map=h"
+    "map_url": "https://maps.app.goo.gl/XcodCZTHfCKKU46VA",
+    "map_note": "Google Maps pin of the chowk"
   },
   "junction_type": "cross (4 arms)",
   "traffic_side": "left",
@@ -19,34 +17,30 @@
     {
       "firmware": "N",
       "pins": "D2 D3 D4",
-      "road": "Mahendra Highway, north arm",
+      "road": "Road to the Pokhara bus park",
       "pole": "P1",
-      "corner": "NE",
-      "landmark": "Namaste Mero Mobile"
+      "corner": "NE"
     },
     {
       "firmware": "E",
       "pins": "D5 D6 D7",
-      "road": "Side road, east arm (towards Hotel Gangotri)",
+      "road": "Mahendra Highway towards Birendra Campus and Tandi",
       "pole": "P2",
-      "corner": "SE",
-      "landmark": "International Courier and Super Kinetic Courier"
+      "corner": "SE"
     },
     {
       "firmware": "S",
       "pins": "D8 D9 D10",
-      "road": "Mahendra Highway, south arm",
+      "road": "Road to Rampur",
       "pole": "P3",
-      "corner": "SW",
-      "landmark": "Eatwell Bakery Cafe"
+      "corner": "SW"
     },
     {
       "firmware": "W",
       "pins": "D11 D12 D13",
-      "road": "Side road, west arm",
+      "road": "Mahendra Highway towards the Narayani bridge",
       "pole": "P4",
-      "corner": "NW",
-      "landmark": "Infotech Computer"
+      "corner": "NW"
     }
   ],
   "timing_s": {
@@ -58,16 +52,16 @@
       "W"
     ],
     "green": {
-      "N": 35,
-      "E": 20,
-      "S": 35,
-      "W": 20
+      "N": 30,
+      "E": 35,
+      "S": 20,
+      "W": 35
     },
     "yellow": 4,
     "all_red": 3,
     "pedestrian_walk": 10,
     "pedestrian_flash": 15,
-    "cycle": 138,
+    "cycle": 148,
     "startup_all_red": 5,
     "night_mode": "flashing yellow, 24 h timer suggested 23:00-05:00",
     "approval": "pending: traffic police / road authority"
@@ -81,14 +75,14 @@
     "source": "firmware/traffic_controller_site01/traffic_controller_site01.ino",
     "hex_real_time": "firmware/build/traffic_controller_site01.hex",
     "hex_proteus_5x": "firmware/build/traffic_controller_site01_sim_x5.hex",
-    "version": "2.1.0-site01",
+    "version": "2.2.0-site01",
     "countdown_source": "firmware/countdown_display/countdown_display.ino",
     "countdown_hex": "firmware/build/countdown_display.hex"
   },
   "countdown": {
     "link_pin": "A5",
     "baud": 9600,
-    "frame_example": "$CD,G,G035,R042,R069,R111*77",
+    "frame_example": "$CD,G,G030,R037,R079,R106*77",
     "display": "4 digits per arm: letter (G/Y/r) + 3 digits; ---- when no time; blank after 3 s without data",
     "unit": "second Arduino Uno + 2 x MAX7219 (U1: N,E  U2: S,W)",
     "pins": {

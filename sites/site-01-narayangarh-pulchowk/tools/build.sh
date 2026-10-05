@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Builds the Site 1 HEX files (controller, 5x controller, countdown display) with the repo's pinned toolchain.
-#   sites/site-01-bharatpur-eatwell/tools/build.sh
+#   sites/site-01-narayangarh-pulchowk/tools/build.sh
 set -euo pipefail
 SITE="$(cd "$(dirname "$0")/.." && pwd)"
 REPO="$(cd "$SITE/../.." && pwd)"

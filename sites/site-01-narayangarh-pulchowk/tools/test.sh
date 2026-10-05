@@ -17,7 +17,7 @@ gcc -O1 -I "$REPO/tools/sim" "$REPO/projects/07-traffic-light-controller/test/si
 gcc -O1 "$SITE/test/countdown_test.c" -o "$WORK/countdown_test" -lsimavr -lelf
 CLEAN='s/\x1b//g; s/\[[0-9;]*m//g'
 {
-  echo "Site 1 (Bharatpur, Mahendra Highway / Eatwell Bakery Cafe) - simulator test"
+  echo "Site 1 (Narayangarh Pulchowk, Narayani bridge chowk) - simulator test"
   echo "Firmware: firmware/traffic_controller_site01/traffic_controller_site01.ino"
   echo
   echo "=== normal operation (5x speed build) ==="

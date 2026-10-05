@@ -1,32 +1,30 @@
 /*
  * ============================================================================
- *  SITE 1  -  Mahendra Highway junction at Eatwell Bakery Cafe, Bharatpur
+ *  SITE 1  -  Narayangarh Pulchowk (Narayani bridge chowk), Chitwan
  * ============================================================================
  *  Author    : Pradip Subedi (github.com/sprasapradip)
  *  Copyright (c) 2023-2026 Pradip Subedi. All rights reserved.
  *              Proprietary - no use, copying or modification without written
  *              permission. See LICENSE in the repository root.
  *  Board     : Arduino Uno / ATmega328P @ 16 MHz
- *  Version   : 2.1.0-site01
+ *  Version   : 2.2.0-site01
  *
- *  Location  : Mahendra Highway, Bharatpur, Chitwan, Nepal
- *              approx. 27.696473 N, 84.421030 E (Eatwell Bakery Cafe corner)
+ *  Location  : Pulchowk, Narayangarh, Bharatpur, Chitwan, Nepal
+ *              the chowk at the east end of the Narayani bridge, where the
+ *              Mahendra Highway meets the road north to the Pokhara bus park
  *
- *  Arms (true compass, as in the site sketch)
- *    North  Mahendra Highway, north arm     pole P1 at the NE corner
- *                                            (Namaste Mero Mobile side)
- *    East   side road, east arm             pole P2 at the SE corner
- *           (towards Hotel Gangotri)        (International Courier side)
- *    South  Mahendra Highway, south arm     pole P3 at the SW corner
- *                                            (Eatwell Bakery Cafe side)
- *    West   side road, west arm             pole P4 at the NW corner
- *                                            (Infotech Computer side)
+ *  Arms (true compass)
+ *    North  road to the Pokhara bus park            pole P1, NE corner
+ *    East   Mahendra Highway to Birendra Campus     pole P2, SE corner
+ *           and Tandi
+ *    South  road to Rampur                          pole P3, SW corner
+ *    West   Mahendra Highway to the Narayani bridge pole P4, NW corner
  *
  *  Timing plan (see README): split phasing N -> E -> S -> W,
- *  highway green 35 s, side road green 20 s, yellow 4 s, all-red 3 s,
- *  pedestrian walk 10 s + flashing 15 s on request. Cycle 138 s.
- *  These are design values for approval by the traffic police / road
- *  authority before switch-on.
+ *  highway (E, W) green 35 s, Pokhara bus park road (N) 30 s, Rampur road
+ *  (S) 20 s, yellow 4 s, all-red 3 s, pedestrian walk 10 s + flashing 15 s
+ *  on request. Cycle 148 s. These are design values for approval by the
+ *  traffic police / road authority before switch-on.
  *
  *  Features
  *    - Non-blocking state machine (no delay() in the control path)
@@ -156,15 +154,15 @@ struct SiteProfile {
 
 const SiteProfile SITES[1] = {
   //  name           arms       plan          N   E   S   W   Y  AR  PW  PF
-  { "BRT-EATWELL", APP_CROSS, PLAN_SPLIT,  { 35, 20, 35, 20 }, 4, 3, 10, 15 },
+  { "NGH-PULCHOWK", APP_CROSS, PLAN_SPLIT, { 30, 35, 20, 35 }, 4, 3, 10, 15 },
 };
 
 // What each firmware arm is on the ground (printed at boot and in status).
 const char *const ARM_NAME[NUM_APPROACHES] = {
-  "N  Mahendra Hwy north  (P1, NE corner, Namaste Mero Mobile)",
-  "E  side road east      (P2, SE corner, International Courier)",
-  "S  Mahendra Hwy south  (P3, SW corner, Eatwell Bakery Cafe)",
-  "W  side road west      (P4, NW corner, Infotech Computer)",
+  "N  to Pokhara bus park            (P1, NE corner)",
+  "E  Mahendra Hwy, Birendra Campus / Tandi side  (P2, SE corner)",
+  "S  to Rampur                      (P3, SW corner)",
+  "W  Mahendra Hwy, Narayani bridge side  (P4, NW corner)",
 };
 
 // ============================================================================
@@ -623,13 +621,13 @@ static void computeLamps() {
 //  Once a second, and whenever a number changes, the controller sends one
 //  line for the countdown display unit:
 //
-//      $CD,G,G035,R042,R069,R111*77
+//      $CD,G,G030,R037,R079,R106*77
 //
 //  field 1  state: U startup, G green, Y yellow, A all-red, W walk,
 //           P walk flashing, C walk clear, N night, E emergency, F fault
 //  fields 2-5  arms N, E, S, W: a letter and three digits
-//           G035  green, 35 s left        Y004  yellow, 4 s left
-//           R042  red, green in 42 s      R---  red, no time (emergency)
+//           G030  green, 30 s left        Y004  yellow, 4 s left
+//           R037  red, green in 37 s      R---  red, no time (emergency)
 //           F---  night flash             X---  dark / fault / no arm
 //  *HH      XOR of the characters between '$' and '*', in hex
 //
@@ -877,7 +875,7 @@ void setup() {
   inPedButton.begin(PIN_PED_BUTTON, 50);
 
   logPrefix();
-  Serial.print(F("Traffic controller v2.1.0 boot, reset="));
+  Serial.print(F("Traffic controller v2.2.0 boot, reset="));
   if (resetCause & _BV(WDRF))       Serial.println(F("WATCHDOG"));
   else if (resetCause & _BV(BORF))  Serial.println(F("BROWN-OUT"));
   else if (resetCause & _BV(EXTRF)) Serial.println(F("RESET-PIN"));

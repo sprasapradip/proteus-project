@@ -1,12 +1,12 @@
 # Site 1 bill of materials
 
-For the Mahendra Highway junction at Eatwell Bakery Cafe, Bharatpur: one cabinet, four signal poles and four countdown displays. Quantities are for this junction. Prices aren't included because they change, so get quotes locally.
+For Narayangarh Pulchowk, the Narayani bridge chowk: one cabinet, four signal poles and four countdown displays. Quantities are for this junction. Prices aren't included because they change, so get quotes locally.
 
 ## Controller cabinet
 
 | # | Item | Qty | Notes |
 |---|---|---|---|
-| 1 | Arduino Uno R3 (genuine or good-quality clone), flashed with `traffic_controller_site01.hex` | 1 + 1 spare | Label both "SITE 1 BRT-EATWELL" |
+| 1 | Arduino Uno R3 (genuine or good-quality clone), flashed with `traffic_controller_site01.hex` | 1 + 1 spare | Label both "SITE 1 NGH-PULCHOWK" |
 | 2 | Lamp driver board, 14 channels: logic-level MOSFET (IRLZ44N or similar) per channel, 100 Ω gate resistor, 10 kΩ gate pull-down, TVS diode per output | 1 | The pull-downs make all lamps go dark if the Arduino fails |
 | 3 | Enclosure, IP65, about 600 × 400 × 200 mm, lockable, with a filtered vent | 1 | On a 300 mm concrete plinth |
 | 4 | DIN rail and terminal blocks | 1 set (about 40 terminals) | Laid out in the same order as the pin table |
@@ -24,9 +24,9 @@ For the Mahendra Highway junction at Eatwell Bakery Cafe, Bharatpur: one cabinet
 
 | # | Item | Qty | Notes |
 |---|---|---|---|
-| 14 | Signal pole, galvanised, 3.5 to 4 m, with base frame | 4 | P1 NE (Namaste Mero Mobile), P2 SE (International Courier), P3 SW (Eatwell Bakery Cafe), P4 NW (Infotech Computer) |
+| 14 | Signal pole, galvanised, 3.5 to 4 m, with base frame | 4 | P1 NE (Pokhara bus park road), P2 SE (Birendra Campus / Tandi), P3 SW (Rampur road), P4 NW (Narayani bridge) |
 | 15 | Vehicle signal head, 300 mm, 3 aspects (R/Y/G), 24 V DC LED | 4 | One per pole, facing its approach |
-| 16 | Repeater head, 300 mm, 3 aspects (recommended for the highway) | 2 | On the far side for the north and south highway approaches, wired in parallel with P1 and P3 |
+| 16 | Repeater head, 300 mm, 3 aspects (recommended for the highway) | 2 | On the far side for the east and west highway approaches, wired in parallel with P2 and P4 |
 | 17 | Pedestrian head, 200 mm, red man / green man, 24 V DC LED | 8 | Two per corner, one facing each crossing. All in parallel on A3/A4 |
 | 18 | Pedestrian push button, IP65 | 4 | One per corner, all in parallel on A2 |
 

@@ -65,7 +65,7 @@ X="$P/15-vehicle-speed-detector"
 run speed-detector "$X/test/sim_test.c" "$OUT/speed.elf"
 
 echo; echo "################ site-01 (controller, fault, countdown link + display)"
-if ! "$R/sites/site-01-bharatpur-eatwell/tools/test.sh" > "$OUT/site01.log" 2>&1 \
+if ! "$R/sites/site-01-narayangarh-pulchowk/tools/test.sh" > "$OUT/site01.log" 2>&1 \
    || ! grep -q "SITE 1: ALL TESTS PASSED" "$OUT/site01.log"; then FAILED+=("site-01"); fi
 grep -E "^\[|^  |Result|SITE 1" "$OUT/site01.log" || true
 

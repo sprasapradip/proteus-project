@@ -12,7 +12,7 @@
  *   - the letters always match the lamps that are actually lit
  *   - a red arm's number is the real time until its green starts, and a
  *     green arm's number is the real time until its yellow (within 1 s)
- *   - the serial log times match the timing plan (a 35 s green reads 35 s)
+ *   - the serial log times match the timing plan (a 30 s green reads 30 s)
  *   - the display unit shows exactly what the last frame said, shows
  *     dashes in night / emergency / fault, ignores corrupt frames and
  *     blanks itself when the link goes quiet
@@ -297,9 +297,9 @@ static int field_num(const char *f) {
   return (f[1] - '0') * 100 + (f[2] - '0') * 10 + (f[3] - '0');
 }
 
-/* log: seconds between "GREEN N for 35s" and the following "YELLOW N" */
+/* log: seconds between "GREEN N for 30s" and the following "YELLOW N" */
 static int log_green_seconds(void) {
-  const char *g = strstr(log_buf, "] GREEN N for 35s");
+  const char *g = strstr(log_buf, "] GREEN N for 30s");
   if (!g) return -1;
   const char *y = strstr(g, "] YELLOW N");
   if (!y) return -1;
@@ -374,7 +374,7 @@ int main(int argc, char **argv) {
   for (int i = 0; i < nframes; i++)
     if (!strncmp(frames[i].text, "$CD,G,", 6)) { first_green = frames[i].text; break; }
   snprintf(msg, sizeof msg, "first green: %.20s", first_green ? first_green + 6 : "none");
-  expect(first_green && !strncmp(first_green + 6, "G035,R042,R069,R111", 19), msg);
+  expect(first_green && !strncmp(first_green + 6, "G030,R037,R079,R106", 19), msg);
 
   printf("[2] letters match the lamps\n");
   int letter_bad = 0, letter_checked = 0;
@@ -440,8 +440,8 @@ int main(int argc, char **argv) {
 
   printf("[5] serial log uses the plan's seconds\n");
   int gs = log_green_seconds();
-  snprintf(msg, sizeof msg, "GREEN N for 35s lasts %d s in the log", gs);
-  expect(gs == 35, msg);
+  snprintf(msg, sizeof msg, "GREEN N for 30s lasts %d s in the log", gs);
+  expect(gs == 30, msg);
   expect(strstr(log_buf, "countdown link on A5") != NULL, "boot log announces the countdown link");
 
   printf("[6] display unit\n");

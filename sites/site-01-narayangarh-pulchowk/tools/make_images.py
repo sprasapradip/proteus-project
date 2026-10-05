@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 """Draws the Site 1 layout, timing plan and countdown wiring into ../images/.
 
-    python3 sites/site-01-bharatpur-eatwell/tools/make_images.py
+    python3 sites/site-01-narayangarh-pulchowk/tools/make_images.py
 
-The layout uses the same orientation as the site sketch and the map
-screenshot: WEST at the top, NORTH to the right. Not to scale.
+The layout is drawn North up. Not to scale.
 """
 from pathlib import Path
 
@@ -22,9 +21,9 @@ RED, YEL, GRN, BLU = "#d62828", "#f4b400", "#2a9d3f", "#1f6feb"
 ROAD, ROAD_HWY, VERGE, BUILD = "#555a63", "#4a4e57", "#e7ecdf", "#d9d2c3"
 
 # Site 1 timing (same numbers as the firmware profile)
-GREEN = {"N": 35, "E": 20, "S": 35, "W": 20}
+GREEN = {"N": 30, "E": 35, "S": 20, "W": 35}
 YELLOW, ALL_RED, PED_WALK, PED_FLASH = 4, 3, 10, 15
-ARM = {"N": "North: Mahendra Hwy", "E": "East: side road", "S": "South: Mahendra Hwy", "W": "West: side road"}
+ARM = {"N": "North: Pokhara bus park", "E": "East: Birendra Campus / Tandi", "S": "South: Rampur", "W": "West: Narayani bridge"}
 
 
 def head(ax, x, y, horizontal, lit=None, s=1.0):
@@ -51,25 +50,31 @@ def layout():
     ax.axis("off")
 
     ax.add_patch(Rectangle((-26, -26), 52, 52, fc=VERGE, zorder=0))
-    HW, SR = 4.5, 3.4            # half widths: highway (horizontal), side road (vertical)
+    HW, SR = 4.5, 3.4            # half widths: Mahendra Highway (E-W), N-S roads
 
-    # Building blocks in the four corners (shops from the map)
-    for x0, y0 in [(-26, HW + 1.2), (SR + 1.2, HW + 1.2), (-26, -26), (SR + 1.2, -26)]:
-        w = 26 - SR - 1.2 if x0 > 0 else 26 - SR - 1.2
-        h = 26 - HW - 1.2
-        ax.add_patch(Rectangle((x0, y0), w, h, fc=BUILD, ec="#c8bfae", lw=0.8, zorder=1))
+    # Narayani river on the west side, with the bridge carrying the highway
+    ax.add_patch(Rectangle((-26, -26), 6.5, 52, fc="#7fb7a8", zorder=1))
+    ax.text(-22.75, 15, "NARAYANI\nRIVER", ha="center", va="center", fontsize=9, color="white",
+            fontweight="bold", rotation=90, zorder=2)
+
+    # Building blocks in the four corners
+    for x0, x1 in [(-19.5, -SR - 1.2), (SR + 1.2, 26)]:
+        for y0, y1 in [(HW + 1.2, 26), (-26, -HW - 1.2)]:
+            ax.add_patch(Rectangle((x0, y0), x1 - x0, y1 - y0, fc=BUILD, ec="#c8bfae", lw=0.8, zorder=1))
 
     # Roads
     ax.add_patch(Rectangle((-26, -HW), 52, 2 * HW, fc=ROAD_HWY, zorder=2))
     ax.add_patch(Rectangle((-SR, -26), 2 * SR, 52, fc=ROAD, zorder=2))
     ax.add_patch(Rectangle((-SR, -HW), 2 * SR, 2 * HW, fc=ROAD_HWY, zorder=3))
+    for y in (HW + 0.15, -HW - 0.15):           # bridge rails
+        ax.plot([-26, -19.5], [y, y], color="#d9dde2", lw=2.2, zorder=3)
     for k in range(-26, 26, 3):
         if abs(k) > SR + 2.6 and abs(k + 1.6) > SR + 2.6:
             ax.plot([k, k + 1.6], [0, 0], color="white", lw=2, zorder=4)
         if abs(k) > HW + 2.6 and abs(k + 1.6) > HW + 2.6:
             ax.plot([0, 0], [k, k + 1.6], color="white", lw=2, zorder=4)
 
-    # Zebra crossings and stop lines (stop line only across the incoming lane)
+    # Zebra crossings
     for i in range(7):
         y = -HW + 0.6 + i * (2 * HW - 1.2) / 6
         for x in (SR + 0.6, -SR - 2.0):
@@ -78,69 +83,71 @@ def layout():
         x = -SR + 0.6 + i * (2 * SR - 1.2) / 4
         for y in (HW + 0.6, -HW - 2.0):
             ax.add_patch(Rectangle((x - 0.3, y), 0.6, 1.4, fc="white", zorder=4))
-    # Left-hand traffic. Paper: West up, North right.
-    #   northbound (to the right) uses the top half, southbound the bottom half
-    #   eastbound (downwards) uses the right half, westbound the left half
-    ax.plot([-SR - 2.6, -SR - 2.6], [0, HW], color="white", lw=3.5, zorder=5)    # from South
-    ax.plot([SR + 2.6, SR + 2.6], [-HW, 0], color="white", lw=3.5, zorder=5)     # from North
-    ax.plot([0, SR], [HW + 2.6, HW + 2.6], color="white", lw=3.5, zorder=5)      # from West
-    ax.plot([-SR, 0], [-HW - 2.6, -HW - 2.6], color="white", lw=3.5, zorder=5)   # from East
+
+    # Left-hand traffic, North up: eastbound uses the north half of the
+    # highway, westbound the south half; southbound the east half of the N-S
+    # road, northbound the west half. Stop lines only across incoming lanes.
+    ax.plot([-SR - 2.6, -SR - 2.6], [0, HW], color="white", lw=3.5, zorder=5)    # from West
+    ax.plot([SR + 2.6, SR + 2.6], [-HW, 0], color="white", lw=3.5, zorder=5)     # from East
+    ax.plot([0, SR], [HW + 2.6, HW + 2.6], color="white", lw=3.5, zorder=5)      # from North
+    ax.plot([-SR, 0], [-HW - 2.6, -HW - 2.6], color="white", lw=3.5, zorder=5)   # from South
 
     arrow = dict(arrowstyle="-|>", mutation_scale=20, lw=2.6, color=YEL, zorder=6)
-    ax.add_patch(FancyArrowPatch((-24, HW / 2), (-SR - 4.2, HW / 2), **arrow))   # from South
-    ax.add_patch(FancyArrowPatch((24, -HW / 2), (SR + 4.2, -HW / 2), **arrow))   # from North
-    ax.add_patch(FancyArrowPatch((SR / 2, 24), (SR / 2, HW + 4.2), **arrow))     # from West
-    ax.add_patch(FancyArrowPatch((-SR / 2, -24), (-SR / 2, -HW - 4.2), **arrow)) # from East
+    ax.add_patch(FancyArrowPatch((-18, HW / 2), (-SR - 4.2, HW / 2), **arrow))    # from West
+    ax.add_patch(FancyArrowPatch((24, -HW / 2), (SR + 4.2, -HW / 2), **arrow))    # from East
+    ax.add_patch(FancyArrowPatch((SR / 2, 24), (SR / 2, HW + 4.2), **arrow))      # from North
+    ax.add_patch(FancyArrowPatch((-SR / 2, -24), (-SR / 2, -HW - 4.2), **arrow))  # from South
 
     # Poles: near-left corner of each approach (left-hand traffic)
     poles = {
-        "P1": ((SR + 1.4, -HW - 1.4), "North approach", True),     # NE corner (bottom-right)
-        "P2": ((-SR - 1.4, -HW - 1.4), "East approach", False),    # SE corner (bottom-left)
-        "P3": ((-SR - 1.4, HW + 1.4), "South approach", True),     # SW corner (top-left)
-        "P4": ((SR + 1.4, HW + 1.4), "West approach", False),      # NW corner (top-right)
+        "P1": ((SR + 1.4, HW + 1.4), True),      # NE corner, traffic from the North
+        "P2": ((SR + 1.4, -HW - 1.4), False),    # SE corner, traffic from the East
+        "P3": ((-SR - 1.4, -HW - 1.4), True),    # SW corner, traffic from the South
+        "P4": ((-SR - 1.4, HW + 1.4), False),    # NW corner, traffic from the West
     }
-    for tag, ((x, y), what, horiz) in poles.items():
+    for tag, ((x, y), horiz) in poles.items():
         ax.add_patch(Circle((x, y), 0.55, fc="#9aa0a6", ec=INK, lw=1, zorder=8))
         dx = 0 if not horiz else (1.9 if x > 0 else -1.9)
         dy = 0 if horiz else (1.9 if y > 0 else -1.9)
         head(ax, x + dx, y + dy, horiz)
         ax.add_patch(Rectangle((x - 0.25, y - 0.25), 0.5, 0.5, fc=BLU, ec="none", zorder=9))  # push button
 
-    # Pole call-outs with the shop at that corner
-    label(ax, 14, -13.2, "P1  North approach\nNE corner, Namaste Mero Mobile\n(Microshop nearby)", size=9.5)
-    label(ax, -14, -13.2, "P2  East approach\nSE corner, International Courier\n(Hotel Gangotri further east)", size=9.5)
-    label(ax, -14, 13.2, "P3  South approach\nSW corner, Eatwell Bakery Cafe", size=9.5)
-    label(ax, 14, 13.2, "P4  West approach\nNW corner, Infotech Computer", size=9.5)
+    label(ax, 14.5, 13.2, "P1  traffic from the NORTH\n(Pokhara bus park road)\nNE corner", size=9.5)
+    label(ax, 14.5, -13.2, "P2  traffic from the EAST\n(Birendra Campus / Tandi)\nSE corner", size=9.5)
+    label(ax, -11.5, -13.2, "P3  traffic from the SOUTH\n(Rampur road)\nSW corner", size=9.5)
+    label(ax, -11.5, 13.2, "P4  traffic from the WEST\n(off the Narayani bridge)\nNW corner", size=9.5)
 
     # Controller cabinet (SW corner beside P3, position to be agreed on site)
-    ax.add_patch(FancyBboxPatch((-11.5, HW + 2.2), 3.2, 1.8, boxstyle="round,pad=0.05", fc=BLU, ec=INK, zorder=9))
-    ax.text(-9.9, HW + 3.1, "Cabinet", ha="center", va="center", color="white", fontsize=8.5, fontweight="bold", zorder=10)
-    duct = [(-8.3, HW + 3.1), (-SR - 1.4, HW + 3.1), (-SR - 1.4, HW + 1.4), (SR + 1.4, HW + 1.4),
-            (SR + 1.4, -HW - 1.4), (-SR - 1.4, -HW - 1.4), (-SR - 1.4, HW + 1.4)]
+    ax.add_patch(FancyBboxPatch((-11.5, -HW - 4.0), 3.2, 1.8, boxstyle="round,pad=0.05", fc=BLU, ec=INK, zorder=9))
+    ax.text(-9.9, -HW - 3.1, "Cabinet", ha="center", va="center", color="white", fontsize=8.5,
+            fontweight="bold", zorder=10)
+    duct = [(-8.3, -HW - 3.1), (-SR - 1.4, -HW - 3.1), (-SR - 1.4, -HW - 1.4), (SR + 1.4, -HW - 1.4),
+            (SR + 1.4, HW + 1.4), (-SR - 1.4, HW + 1.4), (-SR - 1.4, -HW - 1.4)]
     xs, ys = zip(*duct)
     ax.plot(xs, ys, ls="--", color=BLU, lw=1.4, zorder=7)
 
     # Arm names
-    label(ax, 0, 24.6, "WEST  side road", size=11, weight="bold")
-    label(ax, 0, -24.6, "EAST  side road  (towards Hotel Gangotri)", size=11, weight="bold")
-    ax.text(-25, -HW - 1.3, "SOUTH  Mahendra Highway", fontsize=11, fontweight="bold", color=INK, zorder=12,
-            ha="left", va="top", bbox=dict(boxstyle="round,pad=0.3", fc="white", ec="#c9ccd1"))
-    ax.text(25, HW + 1.3, "NORTH  Mahendra Highway", fontsize=11, fontweight="bold", color=INK, zorder=12,
-            ha="right", va="bottom", bbox=dict(boxstyle="round,pad=0.3", fc="white", ec="#c9ccd1"))
+    label(ax, 0, 24.6, "NORTH  to Pokhara bus park", size=11, weight="bold")
+    label(ax, 0, -24.6, "SOUTH  to Rampur", size=11, weight="bold")
+    ax.text(25, -HW - 1.3, "EAST  Mahendra Highway\nto Birendra Campus / Tandi", fontsize=10.5,
+            fontweight="bold", color=INK, zorder=12, ha="right", va="top",
+            bbox=dict(boxstyle="round,pad=0.3", fc="white", ec="#c9ccd1"))
+    ax.text(-19.0, HW + 4.2, "WEST  Mahendra Highway\nto the Narayani bridge", fontsize=10,
+            fontweight="bold", color=INK, zorder=12, ha="left", va="bottom",
+            bbox=dict(boxstyle="round,pad=0.3", fc="white", ec="#c9ccd1"))
 
-    # Compass: North points to the right on this drawing
-    cx, cy = 20.5, 20.5
+    # Compass, North up
+    cx, cy = 21.0, 21.0
     ax.add_patch(Circle((cx, cy), 3.1, fc="white", ec=INK, lw=1.2, zorder=10))
-    ax.add_patch(Polygon([(cx + 2.6, cy), (cx - 0.6, cy + 0.7), (cx - 0.6, cy - 0.7)], fc=RED, ec="none", zorder=11))
-    for t, (dx, dy) in {"N": (3.9, 0), "S": (-3.9, 0), "W": (0, 3.9), "E": (0, -3.9)}.items():
+    ax.add_patch(Polygon([(cx, cy + 2.6), (cx - 0.7, cy - 0.6), (cx + 0.7, cy - 0.6)], fc=RED, ec="none", zorder=11))
+    for t, (dx, dy) in {"N": (0, 3.9), "S": (0, -3.9), "E": (3.9, 0), "W": (-3.9, 0)}.items():
         ax.text(cx + dx, cy + dy, t, ha="center", va="center", fontsize=11, fontweight="bold", zorder=11,
                 color=RED if t == "N" else INK)
 
-    ax.set_title("Site 1  -  Mahendra Highway junction at Eatwell Bakery Cafe, Bharatpur, Chitwan",
+    ax.set_title("Site 1  -  Narayangarh Pulchowk (Narayani bridge chowk), Chitwan",
                  fontsize=13.5, color=INK, pad=12)
-    fig.text(0.5, 0.075, "Approx. 27.696473 N, 84.421030 E.  Same orientation as the site sketch and the map "
-             "(West at the top). Not to scale.\nYellow = incoming lane (left-hand traffic). Grey circle = pole, "
-             "blue square = pedestrian button, dashed blue = duct ring.",
+    fig.text(0.5, 0.075, "North at the top. Not to scale.\nYellow = incoming lane (left-hand traffic). "
+             "Grey circle = pole, blue square = pedestrian button, dashed blue = duct ring.",
              ha="center", fontsize=9.5, color=MUTED)
     fig.savefig(OUT / "site01-layout.png", dpi=150, bbox_inches="tight", facecolor="white")
     plt.close(fig)
@@ -239,19 +246,19 @@ def countdown_wiring():
     box(0.4, 0.5, 13.5, 5.6, "", [], fc="#fafafa", ec="#c9ccd1")
     ax.text(7.15, 5.6, "Optional: VIRTUAL TERMINAL on A5 shows the raw frames", ha="center", fontsize=9.5,
             color=MUTED)
-    ax.text(0.8, 4.6, "$CD,G,G035,R042,R069,R111*77", fontsize=10.5, family="monospace", color=INK)
+    ax.text(0.8, 4.6, "$CD,G,G030,R037,R079,R106*77", fontsize=10.5, family="monospace", color=INK)
     rows = [("state", "U start, G, Y, A all-red, W/P/C walk, N night, E emerg., F fault"),
-            ("G035", "green, 35 s left"), ("R042", "red, own green starts in 42 s"),
+            ("G030", "green, 30 s left"), ("R037", "red, own green starts in 37 s"),
             ("R---  F---  X---", "no time: emergency / night flash / fault"), ("*77", "XOR checksum")]
     for i, (k, v) in enumerate(rows):
         ax.text(0.8, 3.7 - i * 0.62, k, fontsize=9, family="monospace", color=BLU)
         ax.text(4.6, 3.7 - i * 0.62, v, fontsize=9, color=INK)
 
     # MAX7219 chips and displays
-    for j, (chip, arms) in enumerate([("U1 MAX7219", (("N  Mahendra Hwy north, P1", "G 35", GRN),
-                                                      ("E  side road east, P2", "r 42", RED))),
-                                      ("U2 MAX7219", (("S  Mahendra Hwy south, P3", "r 69", RED),
-                                                      ("W  side road west, P4", "r111", RED)))]):
+    for j, (chip, arms) in enumerate([("U1 MAX7219", (("N  Pokhara bus park, P1", "G 30", GRN),
+                                                      ("E  Birendra Campus / Tandi, P2", "r 37", RED))),
+                                      ("U2 MAX7219", (("S  Rampur, P3", "r 79", RED),
+                                                      ("W  Narayani bridge, P4", "r106", RED)))]):
         y0 = 8.2 - j * 6.6
         ax.add_patch(FancyBboxPatch((15.3, y0), 2.6, 5.4, boxstyle="round,pad=0.08", fc="#20242a", ec="#000",
                                     zorder=1))

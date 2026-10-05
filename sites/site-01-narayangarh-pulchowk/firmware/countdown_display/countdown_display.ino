@@ -1,7 +1,7 @@
 /*
  * ============================================================================
  *  SITE 1  -  Countdown display unit
- *  Mahendra Highway junction at Eatwell Bakery Cafe, Bharatpur
+ *  Narayangarh Pulchowk (Narayani bridge chowk), Chitwan
  * ============================================================================
  *  Author    : Pradip Subedi (github.com/sprasapradip)
  *  Copyright (c) 2023-2026 Pradip Subedi. All rights reserved.
@@ -14,8 +14,8 @@
  *  Listens to the traffic controller's countdown link (controller pin A5)
  *  and shows the seconds left for every arm on four 4-digit displays:
  *
- *      G 35   green, 35 s left          Y  4   yellow, 4 s left
- *      r 42   red, green in 42 s        r111   red, green in 111 s
+ *      G 30   green, 30 s left          Y  4   yellow, 4 s left
+ *      r 37   red, green in 37 s        r106   red, green in 106 s
  *      ----   night flash, emergency or fault (no time to show)
  *      blank  no valid data for 3 s (cable cut, controller off)
  *

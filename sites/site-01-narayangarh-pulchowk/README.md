@@ -1,31 +1,31 @@
-# Site 1: Mahendra Highway junction at Eatwell Bakery Cafe, Bharatpur
+# Site 1: Narayangarh Pulchowk (Narayani bridge chowk), Chitwan
 
 Everything for traffic signal Site 1 is in this folder: the site layout, the firmware built for this junction, the countdown display unit, ready HEX files, the Proteus project, the timing plan, the bill of materials, and the installation and commissioning checklist.
 
 | | |
 |---|---|
-| Location | Mahendra Highway, Bharatpur, Chitwan, Bagmati Province, Nepal |
-| Landmark | Eatwell Bakery Cafe (south-west corner) |
-| Coordinates | approx. 27.696473 N, 84.421030 E ([open in Apple Maps](https://maps.apple.com/place?address=Mahendra%20Highway,%20Bharatpur,%20Nepal&coordinate=27.696473,84.421030&name=Eatwell%20Bakery%20Cafe&place-id=IA238CD8C789DE3E4&map=h)) |
+| Location | Pulchowk, Narayangarh, Bharatpur, Chitwan, Bagmati Province, Nepal |
+| The chowk | East end of the Narayani bridge, where the Mahendra Highway meets the road north to the Pokhara bus park and the road south to Rampur |
+| Map | [Google Maps pin of the chowk](https://maps.app.goo.gl/XcodCZTHfCKKU46VA) |
 | Junction type | "+" cross road, 4 arms, 4 signal poles |
-| Controller | Arduino Uno with this folder's firmware, `BRT-EATWELL` (v2.1.0) |
+| Controller | Arduino Uno with this folder's firmware, `NGH-PULCHOWK` (v2.2.0) |
 | Countdown | Second Arduino Uno + 2 × MAX7219, a 4-digit countdown for every arm |
-| Status | Design ready, tested in the simulator and in Proteus. Timings to be approved before switch-on. |
+| Status | Design ready, tested in the simulator. Timings to be approved before switch-on. |
 
 ![Site 1 layout](images/site01-layout.png)
 
 ## The junction
 
-My site sketch ([photos/site01-hand-sketch.jpg](photos/site01-hand-sketch.jpg)) and the map both put West at the top. The layout drawing above keeps that orientation, so all three line up.
+North is at the top of the layout. Each arm is named by where the road goes.
 
-| Firmware arm | On the ground | Pole | Corner | Shop at the corner |
-|---|---|---|---|---|
-| North (D2-D4) | Mahendra Highway, north arm | P1 | NE | Namaste Mero Mobile (Microshop nearby) |
-| East (D5-D7) | Side road, east arm, towards Hotel Gangotri | P2 | SE | International Courier and Super Kinetic Courier |
-| South (D8-D10) | Mahendra Highway, south arm | P3 | SW | Eatwell Bakery Cafe |
-| West (D11-D13) | Side road, west arm | P4 | NW | Infotech Computer |
+| Firmware arm | Road | Pole | Corner |
+|---|---|---|---|
+| North (D2-D4) | Road to the Pokhara bus park | P1 | NE |
+| East (D5-D7) | Mahendra Highway towards Birendra Campus and Tandi | P2 | SE |
+| South (D8-D10) | Road to Rampur | P3 | SW |
+| West (D11-D13) | Mahendra Highway towards the Narayani bridge | P4 | NW |
 
-We drive on the left, so each pole stands on the near-left corner of the approach it controls, just behind the stop line. The sketch shows the same: every signal head sits on the incoming (left) lane.
+We drive on the left, so each pole stands on the near-left corner of the approach it controls, just behind the stop line. Traffic coming off the Narayani bridge (from the west) stops at P4 on the NW corner. Traffic from the Pokhara bus park road stops at P1 on the NE corner.
 
 ## Timing plan
 
@@ -33,16 +33,17 @@ We drive on the left, so each pole stands on the near-left corner of the approac
 
 | Setting | Value | Why |
 |---|---|---|
-| Phasing | Split: N, then E, then S, then W | Right-turning traffic crosses the oncoming lane. On a national highway with buses and trucks, giving each arm its own green is the safe choice without separate turn arrows. |
-| Green, highway (N, S) | 35 s each | Mahendra Highway carries most of the traffic |
-| Green, side road (E, W) | 20 s each | Local traffic, shorter queues |
+| Phasing | Split: N, then E, then S, then W | Right-turning traffic crosses the oncoming lane. With buses and trucks on the highway and no separate turn arrows, each arm gets its own green. |
+| Green, Mahendra Highway (E, W) | 35 s each | The highway and the bridge carry the most traffic |
+| Green, Pokhara bus park road (N) | 30 s | Busy, with many buses to and from the bus park |
+| Green, Rampur road (S) | 20 s | Local traffic, shorter queues |
 | Yellow | 4 s | For an approach speed of about 50 km/h: 1 s reaction + 13.9 / (2 × 3) ≈ 3.3 s, rounded up |
 | All-red | 3 s | A vehicle at 50 km/h needs about (20 m junction + 5 m vehicle) / 13.9 ≈ 1.8 s to clear. 3 s gives a margin for trucks and slow motorbikes. |
 | Pedestrian | 10 s WALK + 15 s flashing, on button request | About 15 m of highway to cross at 1.2 m/s ≈ 12.5 s, so the flashing time covers someone who started at the end of WALK |
-| Cycle | 138 s (163 s with a pedestrian phase) | |
+| Cycle | 148 s (176 s with a pedestrian phase) | |
 | Night | Flashing yellow on all arms from a 24 h timer (suggested 23:00 to 05:00) | |
 
-The junction width (about 20 m) and crossing length (about 15 m) are my estimates from the map. Measure them on site. If they're very different, change the yellow, all-red and pedestrian times in the `SITES` table of the firmware. **The traffic police (Chitwan) and the road authority must approve these timings before switch-on.**
+The greens follow which roads I expect to be busiest. Count the traffic on each arm at the peak hours and adjust them. The junction width (about 20 m) and crossing length (about 15 m) are also estimates, so measure them on site. All of these live in the `SITES` table of the firmware. **The traffic police (Chitwan) and the road authority must approve these timings before switch-on.**
 
 ## Files
 
@@ -53,15 +54,16 @@ The junction width (about 20 m) and crossing length (about 15 m) are my estimate
 | `firmware/build/traffic_controller_site01_sim_x5.hex` | 5x faster HEX for Proteus demos (one cycle in about 28 s) |
 | `firmware/countdown_display/countdown_display.ino` | Countdown display unit firmware (second Arduino) |
 | `firmware/build/countdown_display.hex` | HEX for the countdown unit (the same file works with both controller HEX files) |
-| `proteus/site01-bharatpur-eatwell.pdsprj` | Proteus project with the Site 1 sketch inside |
+| `proteus/site01-narayangarh-pulchowk.pdsprj` | Proteus project with the Site 1 sketch inside |
 | `images/site01-layout.png` | Labelled junction layout with the poles, shops, lanes and cabinet |
 | `images/site01-timing.png` | Timing plan |
 | `images/site01-wiring.png` | Controller wiring (same pin map as the main project) |
 | `images/site01-field-hardware.png` | Cabinet, power and lamp driver block diagram |
 | `images/site01-countdown-wiring.png` | Countdown unit wiring and the link format |
-| `photos/site01-hand-sketch.jpg` | My site sketch (location data removed from the photo) |
+| `photos/site01-hand-sketch.jpg` | My first site sketch (location data removed from the photo) |
 | `docs/BILL_OF_MATERIALS.md` | Everything to buy for this junction |
 | `docs/INSTALLATION_AND_COMMISSIONING.md` | Installation steps and the switch-on checklist, with sign-off |
+| `docs/VIDEO_RECORDING_SCRIPT.md` | Shot list for recording the GitHub to Proteus demo video |
 | `site.json` | Site data in one file (location, arms, poles, timings) |
 | `test/countdown_test.c` | Countdown test: runs the controller and the countdown unit together in the simulator |
 | `test/test-report.txt` | Latest simulator test result for this firmware |
@@ -69,29 +71,30 @@ The junction width (about 20 m) and crossing length (about 15 m) are my estimate
 
 ## Running it in Proteus
 
-1. Open `proteus/site01-bharatpur-eatwell.pdsprj`, or your own working schematic.
+1. Open `proteus/site01-narayangarh-pulchowk.pdsprj`, or your own working schematic.
 2. Double-click the Arduino. Set **Program File** to `firmware/build/traffic_controller_site01_sim_x5.hex` and **Clock** to 16 MHz.
 3. Run it. In the virtual terminal (9600 baud) the board introduces itself with this site's arms:
 
 ```
-[S01 BRT-EATWELL t=0s] Traffic controller v2.1.0 boot, reset=POWER-ON
-[S01 BRT-EATWELL t=0s] 4 phases, plan=SPLIT
-[S01 BRT-EATWELL t=0s] N  Mahendra Hwy north  (P1, NE corner, Namaste Mero Mobile)
-[S01 BRT-EATWELL t=0s] E  side road east      (P2, SE corner, International Courier)
-[S01 BRT-EATWELL t=0s] S  Mahendra Hwy south  (P3, SW corner, Eatwell Bakery Cafe)
-[S01 BRT-EATWELL t=1s] W  side road west      (P4, NW corner, Infotech Computer)
-[S01 BRT-EATWELL t=2s] SIMULATION BUILD: runs 5x faster, times shown are controller seconds
-[S01 BRT-EATWELL t=2s] countdown link on A5, 9600 baud
-[S01 BRT-EATWELL t=3s] STARTUP_RED for 5s
-[S01 BRT-EATWELL t=8s] GREEN N for 35s
-[S01 BRT-EATWELL t=43s] YELLOW N for 4s
-[S01 BRT-EATWELL t=47s] ALL_RED for 3s
-[S01 BRT-EATWELL t=50s] GREEN E for 20s
+[S01 NGH-PULCHOWK t=0s] Traffic controller v2.2.0 boot, reset=POWER-ON
+[S01 NGH-PULCHOWK t=0s] 4 phases, plan=SPLIT
+[S01 NGH-PULCHOWK t=0s] N  to Pokhara bus park            (P1, NE corner)
+[S01 NGH-PULCHOWK t=0s] E  Mahendra Hwy, Birendra Campus / Tandi side  (P2, SE corner)
+[S01 NGH-PULCHOWK t=1s] S  to Rampur                      (P3, SW corner)
+[S01 NGH-PULCHOWK t=1s] W  Mahendra Hwy, Narayani bridge side  (P4, NW corner)
+[S01 NGH-PULCHOWK t=2s] SIMULATION BUILD: runs 5x faster, times shown are controller seconds
+[S01 NGH-PULCHOWK t=2s] countdown link on A5, 9600 baud
+[S01 NGH-PULCHOWK t=3s] STARTUP_RED for 5s
+[S01 NGH-PULCHOWK t=7s] GREEN N for 30s
+[S01 NGH-PULCHOWK t=37s] YELLOW N for 4s
+[S01 NGH-PULCHOWK t=41s] ALL_RED for 3s
+[S01 NGH-PULCHOWK t=44s] GREEN E for 35s
+[S01 NGH-PULCHOWK t=80s] YELLOW E for 4s
 ```
 
-The order on the LEDs is North (highway) green, then East, South (highway) and West, with yellow and all-red between each. Type `s` for a status report.
+The order on the LEDs is North (Pokhara bus park) green, then East (Birendra Campus / Tandi), South (Rampur) and West (Narayani bridge), with yellow and all-red between each. Type `s` for a status report.
 
-The `t=` times are controller seconds, so they line up with the timing plan: GREEN N at t=8 and YELLOW N at t=43 is the 35 s green. In the `_sim_x5` build that 35 s passes in 7 real seconds. (Version 2.0.0 printed real seconds here, so a "35 s" green seemed to last 7 s. That's fixed.) The boot lines take a moment to print at 9600 baud, which is why start-up shows t=3 and not t=0.
+The `t=` times are controller seconds, so they line up with the timing plan: GREEN N at t=7 and YELLOW N at t=37 is the 30 s green. The log shows whole seconds, so a step can read one second long or short. In the `_sim_x5` build that 30 s passes in 6 real seconds. (Version 2.0.0 printed real seconds here, so a green seemed to last a fifth of its time. That's fixed.) The boot lines take a moment to print at 9600 baud, which is why start-up shows t=3 and not t=0.
 
 The wiring is the same pin map as the main traffic project (D2 to D13 for the four heads, A0 night, A1 emergency, A2 pedestrian button, A3/A4 pedestrian lamps). See `images/site01-wiring.png`.
 
@@ -103,10 +106,10 @@ Each arm gets a 4-digit countdown:
 
 | Display | Meaning |
 |---|---|
-| `G 35` | green, 35 s left |
+| `G 30` | green, 30 s left |
 | `Y  4` | yellow, 4 s left |
-| `r 42` | red, this arm's green starts in 42 s |
-| `r111` | red, green in 111 s (side road waiting for both highway greens) |
+| `r 37` | red, this arm's green starts in 37 s |
+| `r106` | red, green in 106 s (the bridge arm waiting for the other three greens) |
 | `----` | night flash, emergency hold or fault: no time to count |
 | blank | no data for 3 s (cable cut or controller off). Blank is safer than a frozen number. |
 
@@ -117,7 +120,7 @@ A red arm's number counts down to the start of its own green, including all the 
 Example frame (attach a Proteus VIRTUAL TERMINAL to A5 at 9600 baud to watch them):
 
 ```
-$CD,G,G035,R042,R069,R111*77
+$CD,G,G030,R037,R079,R106*77
 ```
 
 `G` is the controller state, then the N, E, S and W fields, then an XOR checksum. The countdown unit ignores any frame with a bad checksum.
@@ -132,7 +135,7 @@ The schematic in `proteus/` dates from 2023. Its single 7-segment digit and its 
 4. ARD2 **D11** to DIN of U1 and U2, **D13** to CLK of both, **D10** to LOAD of U1, **D9** to LOAD of U2. Give each MAX7219 VCC, GND, and ISET through 10k to +5 V.
 5. U1 **SEG A to G and DP** go to the A to G and DP pins of both the N and E displays. U1 **DIG0 to DIG3** go to pins 1 to 4 of the N display, and **DIG4 to DIG7** to pins 1 to 4 of the E display. Do the same for U2 with the S and W displays.
 6. Optional: an LED with 330 Ω on ARD2 **D7** (link OK), and a VIRTUAL TERMINAL on A5.
-7. Run. The displays do a 1 s all-segments test, then show `r  5 r 47 r 74 r116` during start-up all-red, then `G 35 r 42 r 69 r111` when North goes green.
+7. Run. The displays do a 1 s all-segments test, then show `r  5 r 42 r 84 r111` during start-up all-red, then `G 30 r 37 r 79 r106` when North goes green.
 
 The Proteus COUNTER TIMER instrument counts simulation time, and Proteus often runs slower than real time on a busy PC. Don't compare the lights with your watch or with that instrument. Use the countdown display or the `t=` in the log, which both count controller seconds.
 
