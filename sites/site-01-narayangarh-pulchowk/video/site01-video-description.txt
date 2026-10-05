@@ -1,0 +1,31 @@
+TITLE
+Narayangarh Pulchowk traffic signal controller | GitHub to live simulation (Site 01)
+
+DESCRIPTION
+Site 01 of my traffic signal project: the Narayani bridge chowk at Pulchowk, Narayangarh, Chitwan.
+
+North: road to the Pokhara bus park
+East: Mahendra Highway, Birendra Campus / Tandi side
+South: road to Rampur
+West: Mahendra Highway, Narayani bridge side
+
+In this video:
+- the four arms and where each signal pole goes
+- a fresh git clone of the repository and the firmware build
+- the simulator tests (controller and countdown display wired together)
+- the real _sim_x5 firmware running: lamps, countdown displays and the serial log
+
+The simulation shown is simavr running the same HEX file you load in Proteus. The demo build runs 5x faster; on the road the greens are 30 / 35 / 20 / 35 s, pending approval by the traffic police.
+
+Chapters
+0:00 Intro
+0:04 The chowk
+0:14 Get the code
+0:27 Tested
+0:36 Live simulation
+1:10 Run it in Proteus
+1:15 Outro
+
+Code: https://github.com/sprasapradip/proteus-project/tree/main/sites/site-01-narayangarh-pulchowk
+
+Pradip Subedi, Electrical Engineering Student, Nepal

@@ -1,0 +1,11 @@
+Cloning into 'proteus-project'...
+remote: Enumerating objects: 678, done.        
+remote: Counting objects: 100% (256/256)        
+remote: Counting objects: 100% (256/256), done.        
+remote: Compressing objects: 100% (179/179)        
+remote: Compressing objects: 100% (179/179), done.        
+remote: Total 678 (delta 72), reused 216 (delta 45), pack-reused 422 (from 1)        
+Receiving objects: 100% (678/678)
+Receiving objects: 100% (678/678), 7.55 MiB | 21.89 MiB/s, done.
+Resolving deltas: 100% (194/194)
+Resolving deltas: 100% (194/194), done.

@@ -1,0 +1,3 @@
+built sites/site-01-narayangarh-pulchowk/firmware/build/traffic_controller_site01.hex: Program: 7902 bytes (24.1% Full) Data: 815 bytes (39.8% Full) 
+built sites/site-01-narayangarh-pulchowk/firmware/build/traffic_controller_site01_sim_x5.hex: Program: 7952 bytes (24.3% Full) Data: 815 bytes (39.8% Full) 
+built sites/site-01-narayangarh-pulchowk/firmware/build/countdown_display.hex: Program: 3556 bytes (10.9% Full) Data: 272 bytes (13.3% Full) 

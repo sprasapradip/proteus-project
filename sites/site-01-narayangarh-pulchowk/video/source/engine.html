@@ -1,0 +1,398 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Site 1 video engine</title>
+<style>
+  @font-face { font-family: 'Montserrat'; src: url('assets/fonts/Montserrat.ttf') format('truetype'); font-weight: 100 900; font-display: block; }
+  @font-face { font-family: 'Jost'; src: url('assets/fonts/Jost.ttf') format('truetype'); font-weight: 100 900; font-display: block; }
+  :root {
+    --ink: #000C24; --night: #00173D; --blue: #15489D; --blue5: #2F6BD0; --blue4: #5A8BDD; --blue3: #8FB0E6; --blue2: #C3D4F0;
+    --violet3: #C4B5FD; --teal: #22A39A;
+    --red: #ff3b30; --yel: #ffc400; --grn: #22d36b;
+    --grad: linear-gradient(120deg, #5A8BDD 0%, #8FB0E6 45%, #C4B5FD 100%);
+    --head: 'Montserrat', system-ui, sans-serif; --sub: 'Jost', 'Montserrat', system-ui, sans-serif;
+    --mono: 'DejaVu Sans Mono', 'Liberation Mono', monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1920px; height: 1080px; overflow: hidden; }
+  body { font-family: var(--sub); color: #fff; background: var(--ink); position: relative; -webkit-font-smoothing: antialiased; }
+  .g { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .layer { position: absolute; inset: 0; opacity: 0; }
+
+  #bg { position: absolute; inset: 0; overflow: hidden;
+    background: radial-gradient(1400px 900px at 50% 120%, #06337B 0%, transparent 60%), linear-gradient(160deg, #000C24 0%, #00173D 55%, #000C24 100%); }
+  .blob { position: absolute; border-radius: 50%; filter: blur(90px); }
+  #b1 { left: -160px; top: -200px; width: 820px; height: 820px; background: #1D57B8; opacity: .5; }
+  #b2 { right: -180px; bottom: -220px; width: 700px; height: 700px; background: #6B3FB8; opacity: .34; }
+  #b3 { left: 50%; top: 40%; width: 560px; height: 560px; background: #1C8F98; opacity: .22; }
+  #grid { position: absolute; inset: -200px; opacity: .08;
+    background-image: linear-gradient(rgba(143,176,230,.7) 1px, transparent 1px), linear-gradient(90deg, rgba(143,176,230,.7) 1px, transparent 1px);
+    background-size: 72px 72px; -webkit-mask-image: radial-gradient(ellipse at center, #000 20%, transparent 70%); }
+  #vignette { position: absolute; inset: 0; background: radial-gradient(ellipse at center, transparent 55%, rgba(0,6,20,.65) 100%); }
+
+  #corner { position: absolute; right: 64px; top: 46px; z-index: 30; text-align: right; }
+  #corner b { display: block; font: 700 22px var(--head); letter-spacing: .5px; }
+  #corner span { font: 500 13px var(--sub); letter-spacing: .3em; text-transform: uppercase; color: var(--blue3); }
+
+  /* intro */
+  #intro { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+  .chip { display: inline-flex; align-items: center; gap: 12px; padding: 10px 22px; border-radius: 999px;
+    background: rgba(21,36,77,.75); border: 1px solid rgba(143,176,230,.35); font: 500 20px var(--sub); color: var(--blue2); }
+  .lights { display: flex; gap: 14px; padding: 18px 16px; border-radius: 26px; background: #0b1020; border: 1px solid rgba(143,176,230,.35);
+    flex-direction: column; box-shadow: 0 30px 80px -20px rgba(0,0,0,.8); }
+  .lights i { width: 54px; height: 54px; border-radius: 50%; display: block; background: #20262f; }
+  #iEyebrow { font: 600 20px var(--sub); letter-spacing: .42em; text-transform: uppercase; color: var(--blue3); margin-top: 34px; }
+  #iTitle { font: 800 88px/1.04 var(--head); letter-spacing: -2.5px; margin-top: 18px; }
+  #iSub { font: 400 30px var(--sub); color: var(--blue2); margin-top: 24px; }
+  #iBadge { margin-top: 34px; }
+
+  /* chapter card */
+  #chap { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+  #cNum { font: 800 220px/1 var(--head); color: transparent; -webkit-text-stroke: 2px rgba(143,176,230,.35); position: absolute; }
+  #cTitle { font: 800 92px var(--head); letter-spacing: -2px; position: relative; }
+  #cSub { font: 400 30px var(--sub); color: var(--blue2); margin-top: 18px; position: relative; }
+  #cLine { width: 120px; height: 3px; border-radius: 3px; background: var(--grad); margin-top: 26px; position: relative; }
+
+  /* map */
+  #mapCard { position: absolute; left: 120px; top: 70px; width: 860px; height: 900px; border-radius: 22px; background: #fff; overflow: hidden;
+    box-shadow: 0 60px 140px -30px rgba(0,0,0,.8), 0 0 0 1px rgba(143,176,230,.4); }
+  #mapCard img { width: 100%; height: 100%; object-fit: contain; }
+  #arms { position: absolute; left: 1060px; top: 150px; width: 760px; }
+  #arms h2 { font: 800 56px/1.1 var(--head); letter-spacing: -1px; }
+  #arms p.lead { font: 400 26px var(--sub); color: var(--blue2); margin: 14px 0 34px; }
+  .arm { display: flex; align-items: center; gap: 22px; padding: 20px 26px; margin-bottom: 16px; border-radius: 18px;
+    background: rgba(21,36,77,.7); border: 1px solid rgba(143,176,230,.25); }
+  .arm .dir { width: 74px; height: 74px; border-radius: 16px; display: grid; place-items: center; font: 800 34px var(--head); background: rgba(90,139,221,.25); color: #fff; flex: none; }
+  .arm .t1 { font: 700 30px var(--head); }
+  .arm .t2 { font: 400 22px var(--sub); color: var(--blue3); margin-top: 4px; }
+  .arm .gr { margin-left: auto; font: 700 26px var(--head); color: var(--grn); flex: none; }
+
+  /* terminal */
+  #termWin { position: absolute; left: 180px; top: 90px; width: 1560px; height: 820px; border-radius: 18px; overflow: hidden;
+    background: #0a0f1f; box-shadow: 0 60px 140px -30px rgba(0,0,0,.85), 0 0 0 1px rgba(143,176,230,.35); }
+  #termWin .tbar { height: 50px; background: #15244D; display: flex; align-items: center; padding: 0 20px; gap: 9px; }
+  #termWin .tbar i { width: 14px; height: 14px; border-radius: 50%; display: block; }
+  #termWin .tbar i:nth-child(1) { background: #ff5f57; } #termWin .tbar i:nth-child(2) { background: #febc2e; } #termWin .tbar i:nth-child(3) { background: #28c840; }
+  #termWin .tbar span { margin-left: 18px; font: 500 17px var(--sub); color: var(--blue2); }
+  #termBody { padding: 26px 34px; font: 400 20px/1.55 var(--mono); color: #d6e2f5; white-space: pre; }
+  #termBody .p { color: #7ee2a8; } #termBody .c { color: #fff; } #termBody .ok { color: #7ee2a8; } #termBody .dim { color: #8aa0c4; }
+  #termBody .hl { color: #0a0f1f; background: #7ee2a8; padding: 0 8px; border-radius: 4px; }
+  .cur { display: inline-block; width: 12px; height: 24px; background: #d6e2f5; vertical-align: -4px; }
+
+  /* caption pill */
+  #cap { position: absolute; left: 50%; bottom: 46px; transform: translateX(-50%); z-index: 20; opacity: 0;
+    display: flex; align-items: center; gap: 14px; padding: 12px 26px 12px 14px; border-radius: 999px;
+    background: rgba(11,23,54,.9); border: 1px solid rgba(143,176,230,.4); font: 500 24px var(--sub); white-space: nowrap; }
+  #cap b { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; background: var(--blue5); font: 700 20px var(--head); }
+
+  /* simulation */
+  #junction { position: absolute; left: 70px; top: 60px; width: 960px; height: 960px; border-radius: 22px; overflow: hidden;
+    box-shadow: 0 60px 140px -30px rgba(0,0,0,.8), 0 0 0 1px rgba(143,176,230,.4); }
+  #side { position: absolute; left: 1080px; top: 60px; width: 780px; }
+  #side .eb { font: 600 18px var(--sub); letter-spacing: .32em; text-transform: uppercase; color: var(--blue3); }
+  #side h2 { font: 800 50px/1.1 var(--head); letter-spacing: -1px; margin-top: 10px; }
+  #side .src { font: 400 21px var(--sub); color: var(--blue2); margin-top: 10px; }
+  #phase { margin-top: 26px; padding: 22px 26px; border-radius: 18px; background: rgba(21,36,77,.75); border: 1px solid rgba(143,176,230,.3);
+    display: flex; align-items: center; gap: 22px; }
+  #phase .lamp { width: 64px; height: 64px; border-radius: 50%; flex: none; }
+  #phase .p1 { font: 800 29px var(--head); }
+  #phase .p2 { font: 400 22px var(--sub); color: var(--blue3); margin-top: 4px; }
+  #phase .clock { margin-left: auto; text-align: right; flex: none; white-space: nowrap; font: 700 20px var(--sub); color: var(--blue2); }
+  #phase .clock b { display: block; font: 800 40px var(--head); color: #fff; }
+  #log { margin-top: 20px; height: 440px; border-radius: 16px; background: #0a0f1f; border: 1px solid rgba(143,176,230,.3); overflow: hidden; }
+  #log .lh { height: 42px; background: #15244D; display: flex; align-items: center; padding: 0 18px; font: 500 16px var(--sub); color: var(--blue2); gap: 10px; }
+  #log .lh i { width: 10px; height: 10px; border-radius: 50%; background: var(--grn); display: block; }
+  #logBody { padding: 14px 18px; font: 400 15.5px/1.6 var(--mono); color: #d6e2f5; white-space: pre; }
+  #logBody .new { color: #7ee2a8; }
+  #frame { margin-top: 16px; padding: 14px 18px; border-radius: 14px; background: #0a0f1f; border: 1px solid rgba(143,176,230,.3);
+    font: 400 19px var(--mono); color: #ffd36b; white-space: pre; }
+  #frame span { color: var(--blue3); font-family: var(--sub); font-size: 17px; margin-right: 10px; }
+
+  /* steps + outro */
+  #steps { display: flex; align-items: center; justify-content: center; }
+  .card { width: 1380px; padding: 56px 70px; border-radius: 28px; background: rgba(11,23,54,.85); border: 1px solid rgba(143,176,230,.35);
+    box-shadow: 0 60px 140px -30px rgba(0,0,0,.8); }
+  .card .eb { font: 600 20px var(--sub); letter-spacing: .38em; text-transform: uppercase; color: var(--blue3); }
+  .card h2 { font: 800 62px var(--head); letter-spacing: -1.5px; margin: 12px 0 34px; }
+  .step { display: flex; gap: 26px; align-items: flex-start; margin-bottom: 26px; }
+  .step b { width: 54px; height: 54px; border-radius: 50%; flex: none; display: grid; place-items: center; background: var(--blue5); font: 800 26px var(--head); }
+  .step div { font: 400 30px/1.4 var(--sub); padding-top: 6px; }
+  .step code { font: 500 25px var(--mono); color: #ffd36b; background: rgba(0,0,0,.35); padding: 2px 10px; border-radius: 8px; }
+  .note { margin-top: 18px; font: 400 22px var(--sub); color: var(--blue3); }
+  #outro { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+  #oTitle { font: 800 80px var(--head); letter-spacing: -2px; margin-top: 28px; }
+  #oUrl { font: 600 40px var(--sub); margin-top: 22px; }
+  #oStar { margin-top: 30px; }
+  #oBy { margin-top: 44px; font: 500 26px var(--sub); color: var(--blue2); }
+</style>
+</head>
+<body>
+<div id="bg"><div class="blob" id="b1"></div><div class="blob" id="b2"></div><div class="blob" id="b3"></div><div id="grid"></div><div id="vignette"></div></div>
+<div id="corner"><b>proteus-project</b><span>github · sprasapradip</span></div>
+
+<div class="layer" id="intro">
+  <div class="lights"><i id="il0"></i><i id="il1"></i><i id="il2"></i></div>
+  <div id="iEyebrow">Real project · Site 01</div>
+  <div id="iTitle">Narayangarh Pulchowk<br><span class="g">Traffic signal controller</span></div>
+  <div id="iSub">GitHub → Clone → Build → Test → Simulate</div>
+  <div id="iBadge" class="chip">Pradip Subedi · Electrical Engineering Student</div>
+</div>
+
+<div class="layer" id="chap"><div id="cNum">01</div><div id="cTitle">The chowk</div><div id="cSub"></div><div id="cLine"></div></div>
+
+<div class="layer" id="map">
+  <div id="mapCard"><img src="../../images/site01-layout.png"></div>
+  <div id="arms">
+    <h2>Narayani bridge chowk<br><span class="g">four arms, four poles</span></h2>
+    <p class="lead">Split phasing · North → East → South → West · cycle 148 s</p>
+    <div class="arm" id="a0"><div class="dir">N</div><div><div class="t1">Pokhara bus park</div><div class="t2">pole P1 · NE corner</div></div><div class="gr">30 s</div></div>
+    <div class="arm" id="a1"><div class="dir">E</div><div><div class="t1">Birendra Campus / Tandi</div><div class="t2">Mahendra Highway · pole P2 · SE corner</div></div><div class="gr">35 s</div></div>
+    <div class="arm" id="a2"><div class="dir">S</div><div><div class="t1">Rampur</div><div class="t2">pole P3 · SW corner</div></div><div class="gr">20 s</div></div>
+    <div class="arm" id="a3"><div class="dir">W</div><div><div class="t1">Narayani bridge</div><div class="t2">Mahendra Highway · pole P4 · NW corner</div></div><div class="gr">35 s</div></div>
+  </div>
+</div>
+
+<div class="layer" id="term">
+  <div id="termWin"><div class="tbar"><i></i><i></i><i></i><span id="termTitle">bash · ~/projects</span></div><div id="termBody"></div></div>
+</div>
+
+<div class="layer" id="sim">
+  <div id="junction"><svg id="jsvg" viewBox="-26 -26 52 52" width="960" height="960"></svg></div>
+  <div id="side">
+    <div class="eb">Live simulation · real firmware</div>
+    <h2>traffic_controller_site01<br><span class="g">_sim_x5.hex</span></h2>
+    <div class="src">simavr · ATmega328P @ 16 MHz · countdown unit on A5 · 5× demo speed</div>
+    <div id="phase"><div class="lamp" id="pl"></div><div><div class="p1" id="p1"></div><div class="p2" id="p2"></div></div>
+      <div class="clock">controller time<b id="pt">0 s</b></div></div>
+    <div id="log"><div class="lh"><i></i>Serial monitor · 9600 baud</div><div id="logBody"></div></div>
+    <div id="frame"><span>A5 countdown frame</span><b id="fr"></b></div>
+  </div>
+</div>
+
+<div class="layer" id="steps"><div class="card">
+  <div class="eb">Your turn · Proteus</div>
+  <h2>Run the same HEX in <span class="g">Proteus</span></h2>
+  <div class="step"><b>1</b><div>Open <code>proteus/site01-narayangarh-pulchowk.pdsprj</code></div></div>
+  <div class="step"><b>2</b><div>Arduino → Program File <code>firmware/build/traffic_controller_site01_sim_x5.hex</code> · Clock <code>16 MHz</code></div></div>
+  <div class="step"><b>3</b><div>Press Run and watch North → East → South → West</div></div>
+  <div class="note">The demo build runs 5× faster. On the road the greens are 30 / 35 / 20 / 35 s, after approval by the traffic police.</div>
+</div></div>
+
+<div class="layer" id="outro">
+  <div class="lights" style="flex-direction:row"><i id="ol0"></i><i id="ol1"></i><i id="ol2"></i></div>
+  <div id="oTitle">Site 01 · <span class="g">Narayangarh Pulchowk</span></div>
+  <div id="oUrl">github.com/sprasapradip/proteus-project</div>
+  <div id="oStar" class="chip">★ Star the repo if it helps your project</div>
+  <div id="oBy">Pradip Subedi · Electrical Engineering Student, Nepal</div>
+</div>
+
+<div id="cap"><b id="capN">1</b><span id="capT"></span></div>
+
+<script src="data/data.js"></script>
+<script>
+const D = window.DATA;
+const $ = (id) => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
+const ease = (x) => { x = clamp(x); return x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; };
+const vis = (t, a, b, f = .45) => clamp(Math.min((t - a) / f, (b - t) / f));
+
+// ------------------------------------------------------------ timeline
+const T = {
+  intro: [0, 4.6], c1: [4.6, 6.6], map: [6.6, 14.2], c2: [14.2, 16.2], term: [16.2, 27.4],
+  c3: [27.4, 29.4], tests: [29.4, 36.6], c4: [36.6, 38.6], sim: [38.6, 70.6], steps: [70.6, 75.4], outro: [75.4, 80.4],
+};
+window.DURATION = 80.4;
+const CHAPTERS = [
+  [T.c1, '01', 'The chowk', 'Narayani bridge chowk · Narayangarh, Chitwan'],
+  [T.c2, '02', 'Get the code', 'A fresh clone from GitHub, then build'],
+  [T.c3, '03', 'Tested', 'Both boards wired together in the simulator'],
+  [T.c4, '04', 'Live simulation', 'The real _sim_x5 firmware, running'],
+];
+const CAPTIONS = [
+  [T.map, 1, 'Each arm is named by where the road goes'],
+  [T.term, 2, 'Real terminal output · fresh clone of main'],
+  [[T.tests[0], T.tests[1]], 3, 'tools/test.sh · every check passes'],
+];
+
+// ------------------------------------------------------------ terminal scripts
+function termScript(t0, items) {      // items: ['cmd', text] | ['out', text, cls]
+  const ev = []; let t = t0;
+  for (const [k, text, cls] of items) {
+    if (k === 'cmd') { ev.push({ t, k, text, dur: Math.max(.5, text.length / 42) }); t += text.length / 42 + .35; }
+    else if (k === 'pause') { t += text; }
+    else { ev.push({ t, k, text, cls }); t += .13; }
+  }
+  return ev;
+}
+const CLONE = termScript(T.term[0] + .5, [
+  ['cmd', 'git clone https://github.com/sprasapradip/proteus-project.git'],
+  ...D.clone.map((l) => ['out', l, 'dim']), ['pause', .4],
+  ['cmd', 'cd proteus-project/sites/site-01-narayangarh-pulchowk'], ['pause', .2],
+  ['cmd', 'ls'], ['out', D.ls.join('   '), 'c'], ['pause', .5],
+  ['cmd', 'tools/build.sh'], ...D.build.map((l) => ['out', l.replace(/\s+$/, ''), 'ok']),
+]);
+const TESTS = termScript(T.tests[0] + .4, [
+  ['cmd', 'tools/test.sh'], ['pause', .2],
+  ...D.tests.map((l) => ['out', l, /Result: PASS/.test(l) ? 'ok' : /^\[/.test(l) ? 'c' : 'dim']),
+  ['out', 'SITE 1: ALL TESTS PASSED', 'hl'],
+]);
+const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+function renderTerm(t, ev, title, maxLines) {
+  $('termTitle').textContent = title;
+  const lines = [];
+  for (const e of ev) {
+    if (t < e.t) break;
+    if (e.k === 'cmd') {
+      const n = Math.floor(clamp((t - e.t) / e.dur) * e.text.length);
+      lines.push(`<span class="p">pradip@lab</span>:<span class="dim">~/projects</span>$ <span class="c">${esc(e.text.slice(0, n))}</span>`);
+    } else lines.push(`<span class="${e.cls}">${esc(e.text)}</span>`);
+  }
+  if (Math.floor(t * 2.2) % 2 === 0) lines[lines.length - 1] = (lines[lines.length - 1] || '') + '<span class="cur"></span>';
+  $('termBody').innerHTML = lines.slice(-maxLines).join('\n');
+}
+
+// ------------------------------------------------------------ junction svg
+const NS = 'http://www.w3.org/2000/svg';
+const el = (tag, attrs, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); (parent || $('jsvg')).appendChild(e); return e; };
+const OFF = '#232a33', COL = { R: '#ff3b30', Y: '#ffc400', G: '#22d36b' };
+const heads = [], displays = [];
+(function buildJunction() {
+  const HW = 4.5, SR = 3.4, Y = (y) => -y;          // svg y grows down; keep maths North-up
+  el('rect', { x: -26, y: -26, width: 52, height: 52, fill: '#e7ecdf' });
+  el('rect', { x: -26, y: -26, width: 6.5, height: 52, fill: '#7fb7a8' });
+  for (const [x0, x1] of [[-19.5, -SR - 1.2], [SR + 1.2, 26]])
+    for (const [y0, y1] of [[HW + 1.2, 26], [-26, -HW - 1.2]])
+      el('rect', { x: x0, y: Y(y1), width: x1 - x0, height: y1 - y0, fill: '#d9d2c3', stroke: '#c8bfae', 'stroke-width': .1 });
+  el('rect', { x: -26, y: -HW, width: 52, height: 2 * HW, fill: '#4a4e57' });
+  el('rect', { x: -SR, y: -26, width: 2 * SR, height: 52, fill: '#555a63' });
+  el('rect', { x: -SR, y: -HW, width: 2 * SR, height: 2 * HW, fill: '#4a4e57' });
+  for (let k = -26; k < 26; k += 3) {
+    if (Math.abs(k) > SR + 2.6 && Math.abs(k + 1.6) > SR + 2.6) el('line', { x1: k, y1: 0, x2: k + 1.6, y2: 0, stroke: '#fff', 'stroke-width': .22 });
+    if (Math.abs(k) > HW + 2.6 && Math.abs(k + 1.6) > HW + 2.6) el('line', { x1: 0, y1: k, x2: 0, y2: k + 1.6, stroke: '#fff', 'stroke-width': .22 });
+  }
+  for (let i = 0; i < 7; i++) { const y = -HW + .6 + i * (2 * HW - 1.2) / 6;
+    for (const x of [SR + .6, -SR - 2.0]) el('rect', { x, y: y - .3, width: 1.4, height: .6, fill: '#fff' }); }
+  for (let i = 0; i < 5; i++) { const x = -SR + .6 + i * (2 * SR - 1.2) / 4;
+    for (const y of [HW + .6, -HW - 2.0]) el('rect', { x: x - .3, y: Y(y) - 1.4, width: .6, height: 1.4, fill: '#fff' }); }
+  // stop lines (left-hand traffic)
+  el('line', { x1: -SR - 2.6, y1: Y(0), x2: -SR - 2.6, y2: Y(HW), stroke: '#fff', 'stroke-width': .4 });
+  el('line', { x1: SR + 2.6, y1: Y(-HW), x2: SR + 2.6, y2: Y(0), stroke: '#fff', 'stroke-width': .4 });
+  el('line', { x1: 0, y1: Y(HW + 2.6), x2: SR, y2: Y(HW + 2.6), stroke: '#fff', 'stroke-width': .4 });
+  el('line', { x1: -SR, y1: Y(-HW - 2.6), x2: 0, y2: Y(-HW - 2.6), stroke: '#fff', 'stroke-width': .4 });
+  const lbl = (x, y, text, size = 1.15, anchor = 'middle', color = '#1d232b') => {
+    const t = el('text', { x, y, 'font-size': size, 'font-family': 'Montserrat', 'font-weight': 700, fill: color, 'text-anchor': anchor });
+    t.textContent = text; return t; };
+  const pill = (x, y, w, text, anchor) => { el('rect', { x: anchor === 'start' ? x - .6 : anchor === 'end' ? x - w + .6 : x - w / 2, y: y - 1.3, width: w, height: 1.9, rx: .5, fill: '#fff', opacity: .94 }); lbl(x, y, text, 1.05, anchor); };
+  pill(0, -23.6, 19, 'NORTH · Pokhara bus park');
+  pill(0, 24.6, 11, 'SOUTH · Rampur');
+  pill(25, -13.2, 18.5, 'EAST · Birendra Campus / Tandi', 'end');
+  pill(-19, -13.2, 17, 'WEST · Narayani bridge', 'start');
+  const river = lbl(-22.75, 12, 'NARAYANI', 1, 'middle', '#fff'); river.setAttribute('transform', 'rotate(-90 -22.75 12)');
+  // signal heads + countdown displays: N(P1 NE), E(P2 SE), S(P3 SW), W(P4 NW)
+  const spots = [
+    { pole: [SR + 1.4, HW + 1.4], head: [SR + 4.2, HW + 1.4], horiz: true, disp: [SR + 2.4, HW + 6.0] },
+    { pole: [SR + 1.4, -HW - 1.4], head: [SR + 1.4, -HW - 4.2], horiz: false, disp: [SR + 3.0, -HW - 2.2] },
+    { pole: [-SR - 1.4, -HW - 1.4], head: [-SR - 4.2, -HW - 1.4], horiz: true, disp: [-SR - 9.8, -HW - 4.9] },
+    { pole: [-SR - 1.4, HW + 1.4], head: [-SR - 1.4, HW + 4.2], horiz: false, disp: [-SR - 9.8, HW + 5.2] },
+  ];
+  spots.forEach((s, a) => {
+    el('circle', { cx: s.pole[0], cy: Y(s.pole[1]), r: .55, fill: '#9aa0a6', stroke: '#1d232b', 'stroke-width': .1 });
+    const [hx, hy] = [s.head[0], Y(s.head[1])];
+    const w = s.horiz ? 3.6 : 1.4, h = s.horiz ? 1.4 : 3.6;
+    el('rect', { x: hx - w / 2, y: hy - h / 2, width: w, height: h, rx: .3, fill: '#0b0d10', stroke: '#000', 'stroke-width': .08 });
+    const c = ['R', 'Y', 'G'].map((k, i) => {
+      const off = (i - 1) * 1.1;
+      return el('circle', { cx: s.horiz ? hx + off : hx, cy: s.horiz ? hy : hy + off, r: .45, fill: OFF });
+    });
+    heads.push(c);
+    // 4-digit display
+    const [dx, dy] = [s.disp[0], Y(s.disp[1])];
+    el('rect', { x: dx - .4, y: dy - .4, width: 6.6, height: 2.9, rx: .35, fill: '#07090c', stroke: '#2b3340', 'stroke-width': .1 });
+    const digs = [];
+    for (let d = 0; d < 4; d++) {
+      const x0 = dx + .2 + d * 1.55, y0 = dy, W = 1.05, H = 2.1, th = .27;
+      const segs = {
+        a: [x0, y0, W, th], b: [x0 + W - th, y0, th, H / 2], c: [x0 + W - th, y0 + H / 2, th, H / 2],
+        d: [x0, y0 + H - th, W, th], e: [x0, y0 + H / 2, th, H / 2], f: [x0, y0, th, H / 2], g: [x0, y0 + H / 2 - th / 2, W, th] };
+      const r = {}; for (const k in segs) { const [x, y, ww, hh] = segs[k]; r[k] = el('rect', { x, y, width: ww, height: hh, fill: '#1a1f27' }); }
+      digs.push(r);
+    }
+    displays.push(digs);
+  });
+})();
+const SEG = { '0': 'abcdef', '1': 'bc', '2': 'abged', '3': 'abgcd', '4': 'fgbc', '5': 'afgcd', '6': 'afgedc', '7': 'abc', '8': 'abcdefg', '9': 'abcfgd', ' ': '', '-': 'g', 'G': 'acdef', 'Y': 'bcdfg', 'r': 'eg' };
+const ARMNAME = ['NORTH · Pokhara bus park', 'EAST · Birendra Campus / Tandi', 'SOUTH · Rampur', 'WEST · Narayani bridge'];
+const GREEN_S = [30, 35, 20, 35];
+
+function simAt(ms) {               // last captured sample at or before ms
+  let lo = 0, hi = D.sim.length - 1;
+  while (lo < hi) { const m = (lo + hi + 1) >> 1; if (D.sim[m][0] <= ms) lo = m; else hi = m - 1; }
+  return D.sim[lo];
+}
+function renderSim(t) {
+  const ms = (t - T.sim[0]) * 1000 + 300;
+  const [st, lamps, walk, stop, disp, frame] = simAt(ms);
+  for (let a = 0; a < 4; a++) {
+    ['R', 'Y', 'G'].forEach((k, i) => heads[a][i].setAttribute('fill', lamps[a] === k ? COL[k] : OFF));
+    const txt = disp[a], col = txt[0] === 'G' ? COL.G : txt[0] === 'Y' ? COL.Y : txt[0] === 'r' ? COL.R : '#9aa6b8';
+    for (let d = 0; d < 4; d++) { const on = SEG[txt[d]] || ''; for (const k in displays[a][d]) displays[a][d][k].setAttribute('fill', on.includes(k) ? col : '#1a1f27'); }
+  }
+  let a = lamps.search(/[GY]/);
+  if (a >= 0) {
+    const y = lamps[a] === 'Y';
+    $('pl').style.background = y ? COL.Y : COL.G; $('pl').style.boxShadow = `0 0 40px ${y ? COL.Y : COL.G}`;
+    $('p1').textContent = ARMNAME[a];
+    $('p2').textContent = y ? 'yellow · 4 s' : `green · ${GREEN_S[a]} s on the road`;
+  } else {
+    $('pl').style.background = COL.R; $('pl').style.boxShadow = `0 0 40px ${COL.R}`;
+    $('p1').textContent = 'ALL RED'; $('p2').textContent = st < 1200 ? 'start-up · every arm red' : 'clearance · 3 s';
+  }
+  $('pt').textContent = `${Math.floor(st / 200)} s`;
+  const shown = D.logs.filter((l) => l[0] <= ms).slice(-15);
+  $('logBody').innerHTML = shown.map((l) => `<span class="${ms - l[0] < 700 ? 'new' : ''}">${esc(l[1].replace('[S01 NGH-PULCHOWK ', '['))}</span>`).join('\n');
+  $('fr').textContent = frame || '(waiting)';
+}
+
+// ------------------------------------------------------------ render
+window.render = function (t) {
+  const b = (s) => `translate(${Math.sin(t * s) * 60}px, ${Math.cos(t * s * .8) * 40}px)`;
+  $('b1').style.transform = b(.21);
+  $('b2').style.transform = b(.17);
+  $('b3').style.transform = b(.13);
+
+  const show = (id, [a, z], scaleFrom = .96) => {
+    const v = vis(t, a, z); const e = $(id);
+    e.style.opacity = v; e.style.transform = `scale(${scaleFrom + (1 - scaleFrom) * ease(v)})`;
+    e.style.display = v > 0 ? '' : 'none'; return v;
+  };
+  show('intro', T.intro, 1.04);
+  const lit = Math.floor(t / .9) % 3;
+  ['#ff3b30', '#ffc400', '#22d36b'].forEach((c, i) => { const on = i === 2 - lit; $('il' + i).style.background = on ? c : '#20262f'; $('il' + i).style.boxShadow = on ? `0 0 34px ${c}` : 'none';
+    $('ol' + i).style.background = on ? c : '#20262f'; $('ol' + i).style.boxShadow = on ? `0 0 34px ${c}` : 'none'; });
+
+  const ch = CHAPTERS.find(([r]) => t >= r[0] && t < r[1]);
+  $('chap').style.display = ch ? '' : 'none';
+  if (ch) { show('chap', ch[0], 1.05); $('cNum').textContent = ch[1]; $('cTitle').textContent = ch[2]; $('cSub').textContent = ch[3]; }
+
+  if (show('map', T.map)) for (let a = 0; a < 4; a++) {
+    const v = ease((t - T.map[0] - .8 - a * .55) / .5); const e = $('a' + a);
+    e.style.opacity = v; e.style.transform = `translateX(${(1 - v) * 40}px)`;
+  }
+  const inTerm = t >= T.term[0] && t < T.term[1], inTests = t >= T.tests[0] && t < T.tests[1];
+  $('term').style.display = inTerm || inTests ? '' : 'none';
+  if (inTerm) { show('term', T.term); renderTerm(t, CLONE, 'bash · ~/projects', 22); }
+  if (inTests) { show('term', T.tests); renderTerm(t, TESTS, 'bash · site-01-narayangarh-pulchowk', 22); }
+  if (show('sim', T.sim)) renderSim(t);
+  show('steps', T.steps);
+  show('outro', T.outro, 1.04);
+
+  const cap = CAPTIONS.find(([r]) => t >= r[0] && t < r[1]);
+  if (cap) { $('cap').style.opacity = vis(t, cap[0][0] + .3, cap[0][1] - .1, .3); $('capN').textContent = cap[1]; $('capT').textContent = cap[2]; }
+  else $('cap').style.opacity = 0;
+  $('corner').style.opacity = t < T.intro[1] - .3 || t > T.outro[0] ? 0 : 1;
+};
+window.render(0);
+</script>
+</body>
+</html>

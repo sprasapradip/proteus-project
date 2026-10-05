@@ -14,6 +14,8 @@ Everything for traffic signal Site 1 is in this folder: the site layout, the fir
 
 ![Site 1 layout](images/site01-layout.png)
 
+Demo video: [video/site01-narayangarh-pulchowk-demo.mp4](video/site01-narayangarh-pulchowk-demo.mp4) (80 s, with real build and test output and the real firmware running).
+
 ## The junction
 
 North is at the top of the layout. Each arm is named by where the road goes.
@@ -64,6 +66,8 @@ The greens follow which roads I expect to be busiest. Count the traffic on each 
 | `docs/BILL_OF_MATERIALS.md` | Everything to buy for this junction |
 | `docs/INSTALLATION_AND_COMMISSIONING.md` | Installation steps and the switch-on checklist, with sign-off |
 | `docs/VIDEO_RECORDING_SCRIPT.md` | Shot list for recording the GitHub to Proteus demo video |
+| `video/site01-narayangarh-pulchowk-demo.mp4` | 80 s demo video: the chowk, a fresh clone and build, the tests, and the real firmware running in simavr |
+| `video/source/` | How the video is made, with the captured data it is drawn from |
 | `site.json` | Site data in one file (location, arms, poles, timings) |
 | `test/countdown_test.c` | Countdown test: runs the controller and the countdown unit together in the simulator |
 | `test/test-report.txt` | Latest simulator test result for this firmware |
